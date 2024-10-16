@@ -1,3 +1,5 @@
+// lib/blocs/product_state.dart
+
 import 'package:equatable/equatable.dart';
 import '../../models/product.dart';
 
@@ -8,9 +10,13 @@ abstract class ProductState extends Equatable {
   List<Object> get props => [];
 }
 
-class ProductInitial extends ProductState {}
+class ProductInitial extends ProductState {
+  const ProductInitial(); // Added const constructor
+}
 
-class ProductLoading extends ProductState {}
+class ProductLoading extends ProductState {
+  const ProductLoading(); // Added const constructor
+}
 
 class ProductSuccess extends ProductState {
   final List<Product> products;

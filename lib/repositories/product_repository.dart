@@ -1,3 +1,5 @@
+// lib/repositories/product_repository.dart
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/product.dart';
@@ -7,10 +9,10 @@ class ProductRepository {
 
   ProductRepository({required this.httpClient});
 
-  // Fetch products from the API with pagination
+  // Fetch products from the hosted JSON file with pagination
   Future<List<Product>> fetchProducts({required int page, required int limit}) async {
     final response = await httpClient.get(
-      Uri.parse('https://api.example.com/products?page=$page&limit=$limit'),
+      Uri.parse('https://tammy35334.github.io/test/products.json'),
     );
 
     if (response.statusCode != 200) {
@@ -18,6 +20,10 @@ class ProductRepository {
     }
 
     final data = jsonDecode(response.body) as List;
-    return data.map((json) => Product.fromJson(json)).toList();
+    final start = (page - 1) * limit;
+    // Removed the unused 'end' variable
+    final paginatedData = data.skip(start).take(limit).toList();
+
+    return paginatedData.map((json) => Product.fromJson(json)).toList();
   }
 }

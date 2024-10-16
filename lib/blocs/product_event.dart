@@ -1,3 +1,5 @@
+// lib/blocs/product_event.dart
+
 import 'package:equatable/equatable.dart';
 
 abstract class ProductEvent extends Equatable {
@@ -7,4 +9,6 @@ abstract class ProductEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class FetchProducts extends ProductEvent {}
+class FetchProducts extends ProductEvent {
+  const FetchProducts(); // Added const constructor
+}

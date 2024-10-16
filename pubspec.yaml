@@ -1,3 +1,5 @@
+# pubspec.yaml
+
 name: myapp
 description: "A new Flutter project."
 
@@ -21,6 +23,9 @@ dependencies:
   # State Management using BLoC
   flutter_bloc: ^8.1.6
 
+  # BLoC package (required for 'package:bloc/bloc.dart')
+  bloc: ^8.1.0
+
   # Equatable for value comparisons
   equatable: ^2.0.5
 
@@ -40,6 +45,12 @@ dependencies:
 
   # JSON Serialization
   json_annotation: ^4.9.0
+
+  # Cached network image for better performance
+  cached_network_image: ^3.4.1
+
+  # Shared Preferences for local storage
+  shared_preferences: ^2.3.2
 
 dev_dependencies:
   flutter_test:
@@ -84,23 +95,3 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
-
-# Optional: Remove or adjust dependency_overrides if previously added
-# dependency_overrides:
-#   async: ^2.12.0
-#   characters: ^1.3.1
-#   collection: ^1.19.0
-#   http_parser: ^4.1.0
-#   material_color_utilities: ^0.12.0
-#   meta: ^1.16.0
-#   string_scanner: ^1.3.0
-#   _fe_analyzer_shared: ^76.0.0
-#   analyzer: ^6.11.0
-#   leak_tracker: ^10.0.7
-#   leak_tracker_flutter_testing: ^3.0.8
-#   lints: ^5.1.0
-#   macros: ^0.1.3-main.0
-#   shelf: ^1.4.2
-#   stack_trace: ^1.12.0
-#   test_api: ^0.7.3
-#   vm_service: ^14.3.0

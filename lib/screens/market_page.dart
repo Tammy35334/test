@@ -1,29 +1,35 @@
+// lib/screens/market_page.dart
+
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:http/http.dart' as http; // Added import for http
-import '../blocs/product/product_bloc.dart';
-import '../blocs/product/product_event.dart';
-import '../blocs/product/product_state.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../blocs/product_bloc.dart';
 import '../models/product.dart';
 import '../repositories/product_repository.dart';
 import '../widgets/product_list_item.dart';
+import '../widgets/error_indicator.dart';
+import '../widgets/empty_list_indicator.dart';
 
 class MarketPage extends StatefulWidget {
-  const MarketPage({Key? key}) : super(key: key); // Added key parameter
+  const MarketPage({super.key});
 
   @override
-  _MarketPageState createState() => _MarketPageState();
+  MarketPageState createState() => MarketPageState();
 }
 
-class _MarketPageState extends State<MarketPage> {
+class MarketPageState extends State<MarketPage> {
   static const _pageSize = 20;
 
   final PagingController<int, Product> _pagingController =
       PagingController(firstPageKey: 1);
 
-  late ProductRepository _productRepository;
-  late ProductBloc _productBloc;
+  late final ProductRepository _productRepository;
+  late final ProductBloc _productBloc;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -37,38 +43,185 @@ class _MarketPageState extends State<MarketPage> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      // Fetch products using BLoC
-      _productBloc.add(FetchProducts());
-
-      // Listen to the BLoC state
-      final subscription = _productBloc.stream.listen((state) {
-        if (state is ProductSuccess) {
-          final isLastPage = state.hasReachedMax;
-          if (isLastPage) {
-            _pagingController.appendLastPage(state.products);
-          } else {
-            final nextPageKey = pageKey + 1;
-            _pagingController.appendPage(state.products, nextPageKey);
-          }
-        } else if (state is ProductFailure) {
-          _pagingController.error = state.error;
-        }
-      });
-
-      // Allow some time for the BLoC to emit the state
-      await Future.delayed(Duration(milliseconds: 500));
-
-      await subscription.cancel();
+      final newItems =
+          await _productRepository.fetchProducts(page: pageKey, limit: _pageSize);
+      final isLastPage = newItems.length < _pageSize;
+      if (isLastPage) {
+        _pagingController.appendLastPage(newItems);
+      } else {
+        final nextPageKey = pageKey + 1;
+        _pagingController.appendPage(newItems, nextPageKey);
+      }
     } catch (error) {
       _pagingController.error = error;
+      debugPrint('Error fetching products: $error');
     }
   }
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _pagingController.dispose();
     _productBloc.close();
+    _productRepository.httpClient.close();
     super.dispose();
+  }
+
+  Future<void> _showPincodeBottomSheet() async {
+    String pincode = '';
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Enter Pincode',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Pincode',
+                ),
+                onChanged: (value) {
+                  pincode = value;
+                },
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('pincode', pincode);
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Pincode set to $pincode')),
+                    );
+                  }
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTopBar() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        GestureDetector(
+          onTap: _showPincodeBottomSheet,
+          child: const Text(
+            'M1G1R2',
+            style: TextStyle(
+              fontFamily: 'Roboto',
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.person),
+          onPressed: () {
+            // Handle profile icon tap
+          },
+          tooltip: 'Profile',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImageSection() {
+    return Container(
+      height: 250,
+      width: MediaQuery.of(context).size.width * 0.95, // 95% of width
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: const Center(
+        child: Text(
+          'Image Placeholder',
+          style: TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: TextField(
+        decoration: InputDecoration(
+          hintText: 'Search items',
+          prefixIcon: const Icon(Icons.search),
+          suffixIcon: IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              // Clear the search input
+              _pagingController.refresh();
+            },
+            tooltip: 'Clear Search',
+          ),
+          filled: true,
+          fillColor: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[800]
+              : Colors.grey[200],
+          contentPadding: const EdgeInsets.symmetric(vertical: 0.0),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30.0),
+            borderSide: BorderSide.none,
+          ),
+        ),
+        onChanged: (value) {
+          if (_debounce?.isActive ?? false) _debounce!.cancel();
+          _debounce = Timer(const Duration(milliseconds: 500), () {
+            // Implement search functionality based on 'value'
+            _pagingController.refresh();
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildListView() {
+    return PagedListView<int, Product>(
+      pagingController: _pagingController,
+      shrinkWrap: true,
+      padding: const EdgeInsets.all(16.0),
+      builderDelegate: PagedChildBuilderDelegate<Product>(
+        itemBuilder: (context, item, index) => ProductListItem(product: item),
+        firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
+          error: _pagingController.error?.toString() ?? 'Unknown error',
+          onTryAgain: () => _pagingController.refresh(),
+        ),
+        noItemsFoundIndicatorBuilder: (context) => const EmptyListIndicator(),
+      ),
+    );
+  }
+
+  Widget _buildContent() {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          _buildTopBar(),
+          const SizedBox(height: 16.0),
+          _buildImageSection(),
+          const SizedBox(height: 16.0),
+          _buildSearchBar(),
+          const SizedBox(height: 16.0),
+          Expanded(child: _buildListView()),
+        ],
+      ),
+    );
   }
 
   @override
@@ -76,66 +229,30 @@ class _MarketPageState extends State<MarketPage> {
     return BlocProvider<ProductBloc>(
       create: (context) => _productBloc,
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'Market',
-            style: TextStyle(fontFamily: 'Roboto', fontSize: 24),
-          ),
-        ),
+        appBar: null, // Removed AppBar to integrate custom top bar within scrollable content
         body: RefreshIndicator(
-          onRefresh: () => Future.sync(
-            () => _pagingController.refresh(),
-          ),
-          child: PagedListView<int, Product>(
-            pagingController: _pagingController,
-            builderDelegate: PagedChildBuilderDelegate<Product>(
-              itemBuilder: (context, item, index) => ProductListItem(product: item),
-              firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
-                error: _pagingController.error.toString(),
-                onTryAgain: () => _pagingController.refresh(),
+          onRefresh: () => Future.sync(() => _pagingController.refresh()),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top,
               ),
-              noItemsFoundIndicatorBuilder: (context) => EmptyListIndicator(),
+              child: IntrinsicHeight(
+                child: _buildContent(),
+              ),
             ),
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // Handle FAB tap, e.g., open a new action
+          },
+          tooltip: 'Cat Action',
+          child: const Icon(Icons.pets), // Cat icon
+        ),
       ),
-    );
-  }
-}
-
-// Custom Widgets for Error and Empty States
-
-class ErrorIndicator extends StatelessWidget {
-  final String error;
-  final VoidCallback onTryAgain;
-
-  const ErrorIndicator({Key? key, required this.error, required this.onTryAgain}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('Error: $error'),
-          SizedBox(height: 8),
-          ElevatedButton(
-            onPressed: onTryAgain,
-            child: Text('Try Again'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class EmptyListIndicator extends StatelessWidget {
-  const EmptyListIndicator({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text('No products found.'),
     );
   }
 }
