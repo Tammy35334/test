@@ -1,12 +1,36 @@
 // lib/main.dart
 
 import 'package:flutter/material.dart';
-import 'screens/market_page.dart';
-import 'screens/flyers_page.dart';
-import 'screens/shopping_list_page.dart';
+import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'storage/storage_interface.dart'; // <-- Ensure this import is present
+import 'storage/storage_factory.dart';
+import 'repositories/product_repository.dart';
+import 'screens/market_page.dart'; // Replace with your actual main screen
+// ignore: unused_import
+import 'models/product.dart'; // Needed for Hive type adapter registration
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Storage
+  StorageInterface storage = await StorageFactory.getStorage(); // <-- StorageInterface is used here
+
+  // Initialize ProductRepository
+  ProductRepository productRepository = ProductRepository(
+    httpClient: http.Client(),
+    storage: storage,
+  );
+
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<ProductRepository>.value(value: productRepository),
+        // Add other providers here if needed
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -55,57 +79,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       themeMode: ThemeMode.system, // Adapts to system theme
-      home: const HomePage(),
-    );
-  }
-}
-
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState(); // Correct implementation
-}
-
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
-
-  static const List<Widget> _pages = <Widget>[
-    MarketPage(),
-    FlyersPage(),
-    ShoppingListPage(),
-  ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        unselectedItemColor: Colors.grey,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Market',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.local_offer),
-            label: 'Flyers',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list),
-            label: 'Shopping List',
-          ),
-        ],
-      ),
+      home: const MarketPage(),
     );
   }
 }

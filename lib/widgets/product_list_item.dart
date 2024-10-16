@@ -1,6 +1,7 @@
 // lib/widgets/product_list_item.dart
 
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../models/product.dart';
 
 class ProductListItem extends StatelessWidget {
@@ -26,6 +27,29 @@ class ProductListItem extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Display product image
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: CachedNetworkImage(
+                imageUrl: product.imageUrl,
+                placeholder: (context, url) => Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.grey[300],
+                  child: const Center(child: CircularProgressIndicator()),
+                ),
+                errorWidget: (context, url, error) => Container(
+                  width: 50,
+                  height: 50,
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.error),
+                ),
+                width: 50,
+                height: 50,
+                fit: BoxFit.cover,
+              ),
+            ),
+            const SizedBox(width: 16.0),
             Expanded(
               child: Text(
                 product.name,

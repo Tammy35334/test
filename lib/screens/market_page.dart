@@ -4,8 +4,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // To handle network images
 
 import '../blocs/product_bloc.dart';
 import '../models/product.dart';
@@ -15,7 +17,7 @@ import '../widgets/error_indicator.dart';
 import '../widgets/empty_list_indicator.dart';
 
 class MarketPage extends StatefulWidget {
-  const MarketPage({Key? key}) : super(key: key);
+  const MarketPage({super.key});
 
   @override
   MarketPageState createState() => MarketPageState();
@@ -27,24 +29,57 @@ class MarketPageState extends State<MarketPage> {
   final PagingController<int, Product> _pagingController =
       PagingController(firstPageKey: 1);
 
-  late final ProductRepository _productRepository;
   late final ProductBloc _productBloc;
   Timer? _debounce;
+  String _searchQuery = '';
+  bool _isConnected = true;
 
   @override
   void initState() {
     super.initState();
-    _productRepository = ProductRepository(httpClient: http.Client());
-    _productBloc = ProductBloc(repository: _productRepository);
+    final productRepository = Provider.of<ProductRepository>(context, listen: false);
+    _productBloc = ProductBloc(repository: productRepository);
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey);
     });
+
+    // Monitor connectivity
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+      if (!mounted) return;
+      setState(() {
+        _isConnected = result != ConnectivityResult.none;
+      });
+      if (_isConnected) {
+        _pagingController.refresh();
+      }
+    });
+
+    // Load cached data initially
+    _loadCachedData();
+  }
+
+  void _loadCachedData() async {
+    final cachedProducts = await _productBloc.repository.getCachedProducts();
+    if (cachedProducts.isNotEmpty) {
+      if (!mounted) return;
+      _pagingController.appendPage(cachedProducts, 2);
+    }
   }
 
   Future<void> _fetchPage(int pageKey) async {
+    if (!_isConnected) {
+      // Inform the user about offline status
+      _pagingController.error = 'No internet connection';
+      return;
+    }
+
     try {
-      final newItems = await _productRepository.fetchProducts(
-          page: pageKey, limit: _pageSize);
+      final newItems = await _productBloc.repository.fetchProducts(
+        page: pageKey,
+        limit: _pageSize,
+        query: _searchQuery.isNotEmpty ? _searchQuery : null,
+      );
+
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
@@ -63,18 +98,18 @@ class MarketPageState extends State<MarketPage> {
     _debounce?.cancel();
     _pagingController.dispose();
     _productBloc.close();
-    _productRepository.httpClient.close();
     super.dispose();
   }
 
   Future<void> _showPincodeBottomSheet() async {
     String pincode = '';
+    if (!mounted) return;
     await showModalBottomSheet(
       context: context,
       builder: (context) {
         return Padding(
           padding:
-              const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 32.0),
+              const EdgeInsets.only(left: 16.0, right: 16.0, top: 24.0, bottom: 16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -82,27 +117,34 @@ class MarketPageState extends State<MarketPage> {
                 'Enter Pincode',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 12.0),
               TextField(
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   hintText: 'Pincode',
-                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   pincode = value;
                 },
               ),
-              const SizedBox(height: 20.0),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () async {
+                  if (pincode.trim().isEmpty) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Pincode cannot be empty')),
+                      );
+                    }
+                    return;
+                  }
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setString('pincode', pincode);
-                  if (!mounted) return; // Guard against unmounted widget
-                  Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Pincode set to $pincode')),
-                  );
+                  if (mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Pincode set to $pincode')),
+                    );
+                  }
                 },
                 child: const Text('Save'),
               ),
@@ -114,43 +156,60 @@ class MarketPageState extends State<MarketPage> {
   }
 
   Widget _buildTopBar() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        GestureDetector(
-          onTap: _showPincodeBottomSheet,
-          child: const Text(
-            'M1G1R2',
-            style: TextStyle(
-              fontFamily: 'Roboto',
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: _showPincodeBottomSheet,
+            child: const Text(
+              'M1G1R2',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.person),
-          onPressed: () {
-            // Handle profile icon tap
-          },
-          tooltip: 'Profile',
-        ),
-      ],
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              // Handle profile icon tap
+            },
+            tooltip: 'Profile',
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildImageSection() {
-    return Container(
-      height: 250,
-      width: MediaQuery.of(context).size.width * 0.95, // 95% of width
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      child: const Center(
-        child: Text(
-          'Image Placeholder',
-          style: TextStyle(fontSize: 18, color: Colors.grey),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Container(
+        height: 200, // Adjusted height for better layout
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.grey[300],
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        // Network image with placeholder and error handling
+        child: CachedNetworkImage(
+          imageUrl: 'https://your-image-url.com/image.jpg', // Replace with your actual image URL
+          placeholder: (context, url) => Container(
+            width: double.infinity,
+            height: 150,
+            color: Colors.grey[300],
+            child: const Center(child: CircularProgressIndicator()),
+          ),
+          errorWidget: (context, url, error) => const Center(
+            child: Text(
+              'Failed to load image',
+              style: TextStyle(fontSize: 18, color: Colors.grey),
+            ),
+          ),
+          fit: BoxFit.cover,
         ),
       ),
     );
@@ -163,14 +222,18 @@ class MarketPageState extends State<MarketPage> {
         decoration: InputDecoration(
           hintText: 'Search items',
           prefixIcon: const Icon(Icons.search),
-          suffixIcon: IconButton(
-            icon: const Icon(Icons.clear),
-            onPressed: () {
-              // Clear the search input
-              _pagingController.refresh();
-            },
-            tooltip: 'Clear Search',
-          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    setState(() {
+                      _searchQuery = '';
+                      _pagingController.refresh();
+                    });
+                  },
+                  tooltip: 'Clear Search',
+                )
+              : null,
           filled: true,
           fillColor: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[800]
@@ -184,10 +247,11 @@ class MarketPageState extends State<MarketPage> {
         onChanged: (value) {
           if (_debounce?.isActive ?? false) _debounce!.cancel();
           _debounce = Timer(const Duration(milliseconds: 500), () {
-            // Implement search functionality based on 'value'
-            _pagingController.refresh();
-            // Optionally, dispatch a search event to the bloc
-            // context.read<ProductBloc>().add(SearchProductsEvent(query: value));
+            if (!mounted) return;
+            setState(() {
+              _searchQuery = value.trim();
+              _pagingController.refresh();
+            });
           });
         },
       ),
@@ -206,23 +270,10 @@ class MarketPageState extends State<MarketPage> {
           onTryAgain: () => _pagingController.refresh(),
         ),
         noItemsFoundIndicatorBuilder: (context) => const EmptyListIndicator(),
-      ),
-    );
-  }
-
-  Widget _buildContent() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          _buildTopBar(),
-          const SizedBox(height: 16.0),
-          _buildImageSection(),
-          const SizedBox(height: 16.0),
-          _buildSearchBar(),
-          const SizedBox(height: 16.0),
-          Expanded(child: _buildListView()),
-        ],
+        newPageErrorIndicatorBuilder: (context) => ErrorIndicator(
+          error: _pagingController.error?.toString() ?? 'Unknown error',
+          onTryAgain: () => _pagingController.retryLastFailedRequest(),
+        ),
       ),
     );
   }
@@ -233,17 +284,20 @@ class MarketPageState extends State<MarketPage> {
       create: (context) => _productBloc,
       child: Scaffold(
         appBar: null, // Removed AppBar to integrate custom top bar within scrollable content
-        body: RefreshIndicator(
-          onRefresh: () => Future.sync(() => _pagingController.refresh()),
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height -
-                    MediaQuery.of(context).padding.top,
-              ),
-              child: IntrinsicHeight(
-                child: _buildContent(),
+        body: SafeArea(
+          child: RefreshIndicator(
+            onRefresh: () => Future.sync(() => _pagingController.refresh()),
+            child: SingleChildScrollView(  // Use SingleChildScrollView to make the whole page scrollable
+              child: Column(
+                children: [
+                  _buildTopBar(),
+                  const SizedBox(height: 16.0),
+                  _buildImageSection(),
+                  const SizedBox(height: 16.0),
+                  _buildSearchBar(),
+                  const SizedBox(height: 16.0),
+                  _buildListView(),  // This will scroll inside the SingleChildScrollView
+                ],
               ),
             ),
           ),

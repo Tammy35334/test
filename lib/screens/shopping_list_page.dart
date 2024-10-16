@@ -1,7 +1,9 @@
 // lib/screens/shopping_list_page.dart
 
 import 'package:flutter/material.dart';
+// ignore: unused_import
 import '../widgets/error_indicator.dart';
+// ignore: unused_import
 import '../widgets/empty_list_indicator.dart';
 
 class ShoppingListPage extends StatelessWidget {
@@ -35,9 +37,9 @@ class ShoppingListPage extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Handle FAB tap
-        },
-        child: const Icon(Icons.pets), // Cat icon
+        }, // Cat icon
         tooltip: 'Cat Action',
+        child: const Icon(Icons.pets),
       ),
     );
   }

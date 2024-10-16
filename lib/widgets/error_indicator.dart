@@ -19,8 +19,10 @@ class ErrorIndicator extends StatelessWidget {
     if (error.contains('Failed host lookup')) {
       errorMessage =
           'Unable to connect to the server. Please check your internet connection.';
+    } else if (error.contains('Error fetching products')) {
+      errorMessage = 'Failed to fetch products. Please try again.';
     } else {
-      errorMessage = error;
+      errorMessage = 'An unexpected error occurred.';
     }
 
     return Center(

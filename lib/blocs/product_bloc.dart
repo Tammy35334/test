@@ -1,32 +1,53 @@
 // lib/blocs/product_bloc.dart
 
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'product_event.dart';
-import 'product_state.dart';
+import 'package:bloc/bloc.dart';
+import 'package:equatable/equatable.dart';
+
+import '../models/product.dart';
 import '../repositories/product_repository.dart';
+
+part 'product_event.dart';
+part 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductRepository repository;
-  static const int _limit = 20;
 
-  ProductBloc({required this.repository}) : super(const ProductInitial()) {
-    on<FetchProducts>(_onFetchProducts);
+  ProductBloc({required this.repository}) : super(ProductInitial()) {
+    on<FetchProductsEvent>(_onFetchProducts);
+    on<SearchProductsEvent>(_onSearchProducts);
   }
 
   Future<void> _onFetchProducts(
-      FetchProducts event, Emitter<ProductState> emit) async {
-    if (state is ProductLoading) return;
-
+      FetchProductsEvent event, Emitter<ProductState> emit) async {
+    emit(ProductLoading());
     try {
-      emit(const ProductLoading());
-
-      // Fetch the first page of products
-      final products = await repository.fetchProducts(page: 1, limit: _limit);
-      final hasReachedMax = products.length < _limit;
-
-      emit(ProductSuccess(products: products, hasReachedMax: hasReachedMax));
+      final products = await repository.fetchProducts(
+        page: event.page,
+        limit: event.limit,
+        query: event.query,
+      );
+      emit(ProductLoaded(
+          products: products, hasReachedMax: products.length < event.limit));
     } catch (e) {
-      emit(ProductFailure(error: e.toString()));
+      emit(ProductError(message: e.toString()));
     }
   }
+
+  Future<void> _onSearchProducts(
+      SearchProductsEvent event, Emitter<ProductState> emit) async {
+    emit(ProductLoading());
+    try {
+      final products = await repository.fetchProducts(
+        page: 1,
+        limit: _pageSize,
+        query: event.query,
+      );
+      emit(ProductLoaded(
+          products: products, hasReachedMax: products.length < _pageSize));
+    } catch (e) {
+      emit(ProductError(message: e.toString()));
+    }
+  }
+
+  static const int _pageSize = 20;
 }
