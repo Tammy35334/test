@@ -15,7 +15,7 @@ import '../widgets/error_indicator.dart';
 import '../widgets/empty_list_indicator.dart';
 
 class MarketPage extends StatefulWidget {
-  const MarketPage({super.key});
+  const MarketPage({Key? key}) : super(key: key);
 
   @override
   MarketPageState createState() => MarketPageState();
@@ -43,8 +43,8 @@ class MarketPageState extends State<MarketPage> {
 
   Future<void> _fetchPage(int pageKey) async {
     try {
-      final newItems =
-          await _productRepository.fetchProducts(page: pageKey, limit: _pageSize);
+      final newItems = await _productRepository.fetchProducts(
+          page: pageKey, limit: _pageSize);
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
         _pagingController.appendLastPage(newItems);
@@ -73,7 +73,8 @@ class MarketPageState extends State<MarketPage> {
       context: context,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding:
+              const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0, bottom: 32.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -81,27 +82,27 @@ class MarketPageState extends State<MarketPage> {
                 'Enter Pincode',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 12.0),
               TextField(
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
                   hintText: 'Pincode',
+                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   pincode = value;
                 },
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () async {
                   final prefs = await SharedPreferences.getInstance();
                   await prefs.setString('pincode', pincode);
-                  if (!mounted) return;
+                  if (!mounted) return; // Guard against unmounted widget
                   Navigator.pop(context);
-                  if (mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Pincode set to $pincode')),
-                    );
-                  }
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Pincode set to $pincode')),
+                  );
                 },
                 child: const Text('Save'),
               ),
@@ -185,6 +186,8 @@ class MarketPageState extends State<MarketPage> {
           _debounce = Timer(const Duration(milliseconds: 500), () {
             // Implement search functionality based on 'value'
             _pagingController.refresh();
+            // Optionally, dispatch a search event to the bloc
+            // context.read<ProductBloc>().add(SearchProductsEvent(query: value));
           });
         },
       ),
