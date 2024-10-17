@@ -3,17 +3,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cached_network_image/cached_network_image.dart'; // To handle network images
-
 import '../blocs/product_bloc.dart';
 import '../models/product.dart';
 import '../repositories/product_repository.dart';
 import '../widgets/product_list_item.dart';
-import '../widgets/error_indicator.dart';
 import '../widgets/empty_list_indicator.dart';
 
 class MarketPage extends StatefulWidget {
@@ -25,134 +21,72 @@ class MarketPage extends StatefulWidget {
 
 class MarketPageState extends State<MarketPage> {
   static const _pageSize = 20;
-
-  final PagingController<int, Product> _pagingController =
-      PagingController(firstPageKey: 1);
+  final ScrollController _scrollController = ScrollController();
 
   late final ProductBloc _productBloc;
   Timer? _debounce;
   String _searchQuery = '';
-  bool _isConnected = true;
+  List<Product> _products = [];
 
   @override
   void initState() {
     super.initState();
     final productRepository = Provider.of<ProductRepository>(context, listen: false);
     _productBloc = ProductBloc(repository: productRepository);
-    _pagingController.addPageRequestListener((pageKey) {
-      _fetchPage(pageKey);
-    });
 
-    // Monitor connectivity
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      if (!mounted) return;
-      setState(() {
-        _isConnected = result != ConnectivityResult.none;
-      });
-      if (_isConnected) {
-        _pagingController.refresh();
-      }
-    });
+    _loadInitialProducts();
 
-    // Load cached data initially
-    _loadCachedData();
-  }
-
-  void _loadCachedData() async {
-    final cachedProducts = await _productBloc.repository.getCachedProducts();
-    if (cachedProducts.isNotEmpty) {
-      if (!mounted) return;
-      _pagingController.appendPage(cachedProducts, 2);
-    }
-  }
-
-  Future<void> _fetchPage(int pageKey) async {
-    if (!_isConnected) {
-      // Inform the user about offline status
-      _pagingController.error = 'No internet connection';
-      return;
-    }
-
-    try {
-      final newItems = await _productBloc.repository.fetchProducts(
-        page: pageKey,
-        limit: _pageSize,
-        query: _searchQuery.isNotEmpty ? _searchQuery : null,
-      );
-
-      final isLastPage = newItems.length < _pageSize;
-      if (isLastPage) {
-        _pagingController.appendLastPage(newItems);
-      } else {
-        final nextPageKey = pageKey + 1;
-        _pagingController.appendPage(newItems, nextPageKey);
-      }
-    } catch (error) {
-      _pagingController.error = error;
-      debugPrint('Error fetching products: $error');
-    }
+    // Listen to search input with a debounce
+    _scrollController.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _debounce?.cancel();
-    _pagingController.dispose();
+    _scrollController.dispose();
     _productBloc.close();
     super.dispose();
   }
 
-  Future<void> _showPincodeBottomSheet() async {
-    String pincode = '';
-    if (!mounted) return;
-    await showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Padding(
-          padding:
-              const EdgeInsets.only(left: 16.0, right: 16.0, top: 24.0, bottom: 16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Enter Pincode',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              TextField(
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'Pincode',
-                ),
-                onChanged: (value) {
-                  pincode = value;
-                },
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  if (pincode.trim().isEmpty) {
-                    if (mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Pincode cannot be empty')),
-                      );
-                    }
-                    return;
-                  }
-                  final prefs = await SharedPreferences.getInstance();
-                  await prefs.setString('pincode', pincode);
-                  if (mounted) {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Pincode set to $pincode')),
-                    );
-                  }
-                },
-                child: const Text('Save'),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  // Function to load products
+  Future<void> _loadInitialProducts() async {
+    final products = await _productBloc.repository.fetchProducts(page: 1, limit: _pageSize);
+    setState(() {
+      _products = products;
+    });
+  }
+
+  // Pull-down-to-refresh handler
+  Future<void> _onRefresh() async {
+    setState(() {
+      _products.clear(); // Clear current list
+    });
+    await _loadInitialProducts(); // Reload products
+  }
+
+  // Search function with debounce
+  void _onSearchChanged(String value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {
+        _searchQuery = value.trim();
+        _loadInitialProducts();
+      });
+    });
+  }
+
+  // Function to handle scrolling
+  void _onScroll() {
+    if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      _loadMoreProducts();
+    }
+  }
+
+  Future<void> _loadMoreProducts() async {
+    final newProducts = await _productBloc.repository.fetchProducts(page: (_products.length / _pageSize).ceil() + 1, limit: _pageSize);
+    setState(() {
+      _products.addAll(newProducts);
+    });
   }
 
   Widget _buildTopBar() {
@@ -188,13 +122,12 @@ class MarketPageState extends State<MarketPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
-        height: 200, // Adjusted height for better layout
+        height: 200,
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.grey[300],
           borderRadius: BorderRadius.circular(12.0),
         ),
-        // Network image with placeholder and error handling
         child: CachedNetworkImage(
           imageUrl: 'https://your-image-url.com/image.jpg', // Replace with your actual image URL
           placeholder: (context, url) => Container(
@@ -228,7 +161,7 @@ class MarketPageState extends State<MarketPage> {
                   onPressed: () {
                     setState(() {
                       _searchQuery = '';
-                      _pagingController.refresh();
+                      _loadInitialProducts();
                     });
                   },
                   tooltip: 'Clear Search',
@@ -244,37 +177,23 @@ class MarketPageState extends State<MarketPage> {
             borderSide: BorderSide.none,
           ),
         ),
-        onChanged: (value) {
-          if (_debounce?.isActive ?? false) _debounce!.cancel();
-          _debounce = Timer(const Duration(milliseconds: 500), () {
-            if (!mounted) return;
-            setState(() {
-              _searchQuery = value.trim();
-              _pagingController.refresh();
-            });
-          });
-        },
+        onChanged: _onSearchChanged,
       ),
     );
   }
 
-  Widget _buildListView() {
-    return PagedListView<int, Product>(
-      pagingController: _pagingController,
+  Widget _buildProductList() {
+    if (_products.isEmpty) {
+      return const EmptyListIndicator();
+    }
+    return ListView.builder(
       shrinkWrap: true,
-      padding: const EdgeInsets.all(16.0),
-      builderDelegate: PagedChildBuilderDelegate<Product>(
-        itemBuilder: (context, item, index) => ProductListItem(product: item),
-        firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
-          error: _pagingController.error?.toString() ?? 'Unknown error',
-          onTryAgain: () => _pagingController.refresh(),
-        ),
-        noItemsFoundIndicatorBuilder: (context) => const EmptyListIndicator(),
-        newPageErrorIndicatorBuilder: (context) => ErrorIndicator(
-          error: _pagingController.error?.toString() ?? 'Unknown error',
-          onTryAgain: () => _pagingController.retryLastFailedRequest(),
-        ),
-      ),
+      physics: const NeverScrollableScrollPhysics(), // Disable internal scrolling
+      itemCount: _products.length,
+      itemBuilder: (context, index) {
+        final product = _products[index];
+        return ProductListItem(product: product);
+      },
     );
   }
 
@@ -283,12 +202,14 @@ class MarketPageState extends State<MarketPage> {
     return BlocProvider<ProductBloc>(
       create: (context) => _productBloc,
       child: Scaffold(
-        appBar: null, // Removed AppBar to integrate custom top bar within scrollable content
+        appBar: null,
         body: SafeArea(
-          child: RefreshIndicator(
-            onRefresh: () => Future.sync(() => _pagingController.refresh()),
-            child: SingleChildScrollView(  // Use SingleChildScrollView to make the whole page scrollable
+          child: RefreshIndicator( // Pull-down-to-refresh functionality
+            onRefresh: _onRefresh, // Handles the pull-down refresh
+            child: SingleChildScrollView(
+              controller: _scrollController, // Attach the scroll controller
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildTopBar(),
                   const SizedBox(height: 16.0),
@@ -296,7 +217,7 @@ class MarketPageState extends State<MarketPage> {
                   const SizedBox(height: 16.0),
                   _buildSearchBar(),
                   const SizedBox(height: 16.0),
-                  _buildListView(),  // This will scroll inside the SingleChildScrollView
+                  _buildProductList(), // Product list is placed inside the scroll view
                 ],
               ),
             ),
@@ -307,9 +228,60 @@ class MarketPageState extends State<MarketPage> {
             // Handle FAB tap, e.g., open a new action
           },
           tooltip: 'Cat Action',
-          child: const Icon(Icons.pets), // Cat icon
+          child: const Icon(Icons.pets),
         ),
       ),
+    );
+  }
+
+  Future<void> _showPincodeBottomSheet() async {
+    if (!mounted) return;
+
+    String pincode = '';
+    await showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Enter Pincode',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              TextField(
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(hintText: 'Pincode'),
+                onChanged: (value) {
+                  pincode = value;
+                },
+              ),
+              const SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  if (pincode.trim().isEmpty) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Pincode cannot be empty')),
+                      );
+                    }
+                    return;
+                  }
+                  final prefs = await SharedPreferences.getInstance();
+                  await prefs.setString('pincode', pincode);
+                  if (!mounted) return;
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Pincode set to $pincode')),
+                  );
+                },
+                child: const Text('Save'),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
