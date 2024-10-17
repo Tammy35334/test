@@ -1,6 +1,6 @@
 // lib/storage/hive_storage.dart
 
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import '../models/product.dart';
 import 'storage_interface.dart';
 
@@ -11,9 +11,8 @@ class HiveStorage implements StorageInterface {
 
   @override
   Future<void> cacheProducts(List<Product> products) async {
-    for (var product in products) {
-      await productsBox.put(product.id, product);
-    }
+    final Map<int, Product> productsMap = { for (var p in products) p.id : p };
+    await productsBox.putAll(productsMap);
   }
 
   @override

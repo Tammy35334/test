@@ -54,6 +54,9 @@ dependencies:
   # Provider for Dependency Injection
   provider: ^6.0.5
 
+  # WebView for displaying flyers
+  webview_flutter: ^4.10.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -68,6 +71,5 @@ dev_dependencies:
   # Hive generator for TypeAdapters
   hive_generator: ^2.0.0
 
-# Flutter-specific configurations
 flutter:
   uses-material-design: true
