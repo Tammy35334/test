@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/store.dart';
 import '../storage/flyers_storage_interface.dart';
+import '../utils/logger.dart'; // Import the logger
 
 class FlyersRepository {
   final http.Client httpClient;
@@ -18,6 +19,7 @@ class FlyersRepository {
     final response = await httpClient.get(url);
 
     if (response.statusCode != 200) {
+      logger.severe('Error fetching flyers: ${response.statusCode}');
       throw Exception('Error fetching flyers: ${response.statusCode}');
     }
 
@@ -29,19 +31,23 @@ class FlyersRepository {
     } else if (data is Map<String, dynamic> && data.containsKey('stores')) {
       stores = (data['stores'] as List).map((json) => Store.fromJson(json)).toList();
     } else {
+      logger.severe('Invalid JSON format');
       throw Exception('Invalid JSON format');
     }
 
-    print('Parsed ${stores.length} stores from JSON.');
+    logger.info('Parsed ${stores.length} stores from JSON.');
 
     // Cache the fetched flyers
     await storage.cacheFlyers(stores);
+    logger.info('Cached ${stores.length} flyers.');
 
     return stores;
   }
 
   // Retrieve cached flyers
   Future<List<Store>> getCachedFlyers() async {
-    return await storage.getCachedFlyers();
+    final cachedFlyers = await storage.getCachedFlyers();
+    logger.info('Retrieved ${cachedFlyers.length} cached flyers.');
+    return cachedFlyers;
   }
 }

@@ -11,6 +11,7 @@ import '../widgets/store_list_item.dart';
 import '../widgets/empty_list_indicator.dart';
 import '../widgets/error_indicator.dart';
 import '../models/store.dart'; 
+import '../utils/logger.dart'; // Import the logger
 
 class FlyersPage extends StatefulWidget {
   static const routeName = '/flyers';
@@ -33,16 +34,20 @@ class FlyersPageState extends State<FlyersPage> {
   }
 
   Future<void> _loadCachedFlyers() async {
-    final cachedFlyers = await _flyersBloc.repository.getCachedFlyers();
-    if (mounted) { // Check if the widget is still mounted
-      if (cachedFlyers.isNotEmpty) {
-        // Implement local pagination with cached data
-        _flyersBloc.pagingController.appendLastPage(cachedFlyers);
-        print('Loaded cached flyers.');
-      } else {
-        _flyersBloc.pagingController.refresh();
-        print('No cached flyers found. Refreshing to fetch new data.');
+    try {
+      final cachedFlyers = await _flyersBloc.repository.getCachedFlyers();
+      if (mounted) { // Check if the widget is still mounted
+        if (cachedFlyers.isNotEmpty) {
+          // Implement local pagination with cached data
+          _flyersBloc.pagingController.appendLastPage(cachedFlyers);
+          logger.info('Loaded cached flyers.');
+        } else {
+          _flyersBloc.pagingController.refresh();
+          logger.info('No cached flyers found. Refreshing to fetch new data.');
+        }
       }
+    } catch (e) {
+      logger.severe('Error loading cached flyers: $e');
     }
   }
 
@@ -54,7 +59,7 @@ class FlyersPageState extends State<FlyersPage> {
 
   // Pull-down-to-refresh handler
   Future<void> _onRefresh() async {
-    print('Refreshing flyers list.');
+    logger.info('Refreshing flyers list.');
     _flyersBloc.pagingController.refresh();
   }
 
@@ -66,7 +71,7 @@ class FlyersPageState extends State<FlyersPage> {
         firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
           error: (_flyersBloc.pagingController.error as Exception).toString(),
           onTryAgain: () {
-            print('Retrying to fetch flyers.');
+            logger.warning('Retrying to fetch flyers.');
             _flyersBloc.pagingController.refresh();
           },
         ),

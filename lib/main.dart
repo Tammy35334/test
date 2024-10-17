@@ -1,7 +1,5 @@
 // lib/main.dart
 
-// ignore_for_file: unused_import
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -16,12 +14,13 @@ import 'screens/flyers_page.dart';
 import 'models/product.dart';
 import 'models/store.dart';
 import 'storage/flyers_storage_interface.dart';
-// Removed unused imports as per your changes
-// import 'storage/hive_storage.dart'; 
-// import 'storage/flyers_storage.dart'; 
+import 'utils/logger.dart'; // New import
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Setup Logger
+  setupLogger();
 
   // Initialize Hive
   await Hive.initFlutter();

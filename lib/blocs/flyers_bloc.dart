@@ -6,6 +6,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../models/store.dart';
 import '../repositories/flyers_repository.dart';
+import '../utils/logger.dart'; // Import the logger
 
 part 'flyers_event.dart';
 part 'flyers_state.dart';
@@ -28,18 +29,18 @@ class FlyersBloc extends Bloc<FlyersEvent, FlyersState> {
 
   Future<void> _onFetchFlyers(FetchFlyersEvent event, Emitter<FlyersState> emit) async {
     try {
-      print('Fetching page ${event.page} with limit ${event.limit}');
+      logger.info('Fetching page ${event.page} with limit ${event.limit}');
 
       // Fetch all flyers once
       final allFlyers = await repository.fetchAllFlyers();
-      print('Fetched ${allFlyers.length} flyers.');
+      logger.info('Fetched ${allFlyers.length} flyers.');
 
       // Implement local pagination
       final int startIndex = event.page * event.limit;
       if (startIndex >= allFlyers.length) {
         pagingController.appendLastPage([]);
         emit(FlyersLoaded(flyers: [], hasReachedMax: true));
-        print('No more flyers to load.');
+        logger.warning('No more flyers to load.');
         return;
       }
 
@@ -49,7 +50,7 @@ class FlyersBloc extends Bloc<FlyersEvent, FlyersState> {
           ? allFlyers.sublist(startIndex, allFlyers.length)
           : allFlyers.sublist(startIndex, endIndex);
 
-      print('Appending page ${event.page}: ${newItems.length} items.');
+      logger.info('Appending page ${event.page}: ${newItems.length} items.');
 
       if (isLastPage) {
         pagingController.appendLastPage(newItems);
@@ -60,7 +61,7 @@ class FlyersBloc extends Bloc<FlyersEvent, FlyersState> {
 
       emit(FlyersLoaded(flyers: newItems, hasReachedMax: isLastPage));
     } catch (e) {
-      print('Error fetching flyers: $e');
+      logger.severe('Error fetching flyers: $e');
       pagingController.error = e;
       emit(FlyersError(message: e.toString()));
     }
