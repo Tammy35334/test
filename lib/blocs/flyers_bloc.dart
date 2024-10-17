@@ -6,7 +6,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 
 import '../models/store.dart';
 import '../repositories/flyers_repository.dart';
-import '../utils/logger.dart'; // Import the logger
+import '../utils/logger.dart'; // Import the  logger
 
 part 'flyers_event.dart';
 part 'flyers_state.dart';
