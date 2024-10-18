@@ -4,17 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'storage/storage_interface.dart';
 import 'storage/storage_factory.dart';
 import 'repositories/product_repository.dart';
 import 'repositories/flyers_repository.dart';
+import 'repositories/likes_repository.dart';
+import 'blocs/likes_bloc.dart';
 import 'screens/market_page.dart';
 import 'screens/flyers_page.dart';
 import 'models/product.dart';
 import 'models/store.dart';
+import 'models/like.dart';
+import 'storage/likes_storage_interface.dart';
 import 'storage/flyers_storage_interface.dart';
-import 'utils/logger.dart'; // New import
+import 'utils/logger.dart';
+import 'widgets/likes_drawer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,10 +34,12 @@ void main() async {
   // Register Hive adapters
   Hive.registerAdapter(ProductAdapter());
   Hive.registerAdapter(StoreAdapter());
+  Hive.registerAdapter(LikeAdapter());
 
   // Initialize Storage
   StorageInterface productStorage = await StorageFactory.getProductStorage('productsBox');
   FlyersStorageInterface flyersStorage = await StorageFactory.getFlyersStorage('flyersBox');
+  LikesStorageInterface likesStorage = await StorageFactory.getLikesStorage('likesBox');
 
   // Initialize Repositories
   ProductRepository productRepository = ProductRepository(
@@ -44,11 +52,19 @@ void main() async {
     storage: flyersStorage,
   );
 
+  LikesRepository likesRepository = LikesRepository(
+    storage: likesStorage,
+  );
+
   runApp(
     MultiProvider(
       providers: [
         Provider<ProductRepository>.value(value: productRepository),
         Provider<FlyersRepository>.value(value: flyersRepository),
+        Provider<LikesRepository>.value(value: likesRepository),
+        BlocProvider<LikesBloc>(
+          create: (context) => LikesBloc(repository: likesRepository)..add(LoadLikesEvent()),
+        ),
         // Add other providers here if needed
       ],
       child: const MyApp(),
@@ -120,9 +136,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   // Initialize the pages once to preserve their state
-  final List<Widget> _pages = const <Widget>[
+  late final List<Widget> _pages = [
     MarketPage(),
     FlyersPage(),
   ];
@@ -133,9 +150,21 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _openLikesDrawer() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.8,
+        child: LikesDrawer(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       body: IndexedStack(
         index: _selectedIndex,
         children: _pages,
@@ -156,10 +185,8 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Handle FAB tap, e.g., open a new action
-        },
-        tooltip: 'Cat Action',
+        onPressed: _openLikesDrawer,
+        tooltip: 'Likes',
         child: const Icon(Icons.pets),
       ),
     );

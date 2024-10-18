@@ -47,6 +47,7 @@ class StoreListItem extends StatelessWidget {
               builder: (context) => FlyerDetailPage(
                 flyerImages: store.flyerImages, // Passing the list of images
                 storeName: store.storeName,
+                imageId: store.storeId.toString(), // Passing the required imageId
               ),
             ),
           );

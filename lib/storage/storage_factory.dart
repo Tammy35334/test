@@ -7,6 +7,9 @@ import 'storage_interface.dart';
 import '../models/product.dart';
 import '../models/store.dart';
 import 'hive_storage.dart';
+import '../models/like.dart';
+import 'likes_storage_interface.dart';
+import 'hive_likes_storage.dart';
 
 class StorageFactory {
   // Factory method for Product storage
@@ -20,4 +23,14 @@ class StorageFactory {
     var box = await Hive.openBox<Store>(boxName);
     return FlyersStorage(flyersBox: box);
   }
+
+static Future<LikesStorageInterface> getLikesStorage(String boxName) async {
+    if (!Hive.isBoxOpen(boxName)) {
+      await Hive.openBox<Like>(boxName);
+    }
+    final box = Hive.box<Like>(boxName);
+    return HiveLikesStorage(box);
+  }
+
 }
+
