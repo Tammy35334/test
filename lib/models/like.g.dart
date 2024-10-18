@@ -8,7 +8,7 @@ part of 'like.dart';
 
 class LikeAdapter extends TypeAdapter<Like> {
   @override
-  final int typeId = 2;
+  final int typeId = 0;
 
   @override
   Like read(BinaryReader reader) {
@@ -17,24 +17,27 @@ class LikeAdapter extends TypeAdapter<Like> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Like(
-      storeName: fields[0] as String,
-      imageId: fields[1] as String,
-      x: fields[2] as double,
-      y: fields[3] as double,
+      id: fields[0] as String,
+      storeName: fields[1] as String,
+      imageId: fields[2] as String,
+      x: fields[3] as double,
+      y: fields[4] as double,
     );
   }
 
   @override
   void write(BinaryWriter writer, Like obj) {
     writer
-      ..writeByte(4)
+      ..writeByte(5)
       ..writeByte(0)
-      ..write(obj.storeName)
+      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.imageId)
+      ..write(obj.storeName)
       ..writeByte(2)
-      ..write(obj.x)
+      ..write(obj.imageId)
       ..writeByte(3)
+      ..write(obj.x)
+      ..writeByte(4)
       ..write(obj.y);
   }
 
@@ -48,21 +51,3 @@ class LikeAdapter extends TypeAdapter<Like> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-Like _$LikeFromJson(Map<String, dynamic> json) => Like(
-      storeName: json['storeName'] as String,
-      imageId: json['imageId'] as String,
-      x: (json['x'] as num).toDouble(),
-      y: (json['y'] as num).toDouble(),
-    );
-
-Map<String, dynamic> _$LikeToJson(Like instance) => <String, dynamic>{
-      'storeName': instance.storeName,
-      'imageId': instance.imageId,
-      'x': instance.x,
-      'y': instance.y,
-    };

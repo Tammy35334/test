@@ -34,7 +34,7 @@ void main() async {
   // Register Hive adapters
   Hive.registerAdapter(ProductAdapter());
   Hive.registerAdapter(StoreAdapter());
-  Hive.registerAdapter(LikeAdapter());
+  Hive.registerAdapter(LikeAdapter()); // Ensure LikeAdapter is registered
 
   // Initialize Storage
   StorageInterface productStorage = await StorageFactory.getProductStorage('productsBox');
