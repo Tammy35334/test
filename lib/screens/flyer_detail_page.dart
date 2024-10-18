@@ -112,7 +112,7 @@ class _FlyerDetailPageState extends State<FlyerDetailPage>
 
     logger.info('Long pressed at (${imagePosition.dx}, ${imagePosition.dy}) on image index $index.');
 
-    // Add like to the BLoC
+    // Add like to the BLoC using the factory constructor
     final like = Like.create(
       storeName: widget.storeName,
       imageId: _imageIds[index],

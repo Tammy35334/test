@@ -31,10 +31,10 @@ void main() async {
   // Initialize Hive
   await Hive.initFlutter();
 
-  // Register Hive adapters
-  Hive.registerAdapter(ProductAdapter());
-  Hive.registerAdapter(StoreAdapter());
-  Hive.registerAdapter(LikeAdapter()); // Ensure LikeAdapter is registered
+  // Register Hive adapters with unique typeIds
+  Hive.registerAdapter(ProductAdapter()); // typeId = 0
+  Hive.registerAdapter(StoreAdapter());   // typeId = 1
+  Hive.registerAdapter(LikeAdapter());    // typeId = 2
 
   // Initialize Storage
   StorageInterface productStorage = await StorageFactory.getProductStorage('productsBox');

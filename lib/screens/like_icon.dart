@@ -9,7 +9,7 @@ class LikeIcon extends StatefulWidget {
   final VoidCallback onRemove;
 
   const LikeIcon({
-    super.key, // Convert 'key' to a super parameter
+    super.key, // Converted to super parameter
     required this.like,
     required this.transformationController,
     required this.onRemove,

@@ -7,7 +7,7 @@ part 'store.g.dart';
 
 @HiveType(typeId: 1)
 @JsonSerializable()
-class Store {
+class Store extends HiveObject {
   @HiveField(0)
   final int storeId;
 

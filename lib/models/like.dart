@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 part 'like.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 2) // Changed from 0 to 2 to ensure uniqueness
 class Like extends HiveObject {
   @HiveField(0)
   final String id;

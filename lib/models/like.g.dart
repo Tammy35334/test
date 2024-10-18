@@ -8,7 +8,7 @@ part of 'like.dart';
 
 class LikeAdapter extends TypeAdapter<Like> {
   @override
-  final int typeId = 0;
+  final int typeId = 2;
 
   @override
   Like read(BinaryReader reader) {
