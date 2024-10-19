@@ -50,4 +50,19 @@ class FlyersRepository {
     logger.info('Retrieved ${cachedFlyers.length} cached flyers.');
     return cachedFlyers;
   }
+
+  Future<void> addFlyer(Store flyer) async {
+    await storage.addFlyer(flyer);
+    logger.info('Flyer added: ${flyer.storeName}');
+  }
+
+  Future<void> updateFlyer(Store flyer) async {
+    await storage.updateFlyer(flyer);
+    logger.info('Flyer updated: ${flyer.storeName}');
+  }
+
+  Future<void> deleteFlyer(String id) async {
+    await storage.deleteFlyer(id);
+    logger.info('Flyer deleted with id: $id');
+  }
 }

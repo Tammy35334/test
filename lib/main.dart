@@ -6,18 +6,18 @@ import 'package:http/http.dart' as http;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'storage/storage_interface.dart';
-import 'storage/storage_factory.dart';
+import 'storage/drawing_storage_interface.dart';
+import 'storage/drawings_storage.dart';
+import 'storage/hive_storage.dart';
+import 'storage/flyers_storage.dart';
 import 'repositories/product_repository.dart';
 import 'repositories/flyers_repository.dart';
-import 'blocs/drawing_bloc.dart'; 
-import 'blocs/drawing_event.dart'; 
+import 'blocs/drawing_bloc.dart';
 import 'screens/market_page.dart';
 import 'screens/flyers_page.dart';
 import 'models/product.dart';
 import 'models/store.dart';
 import 'models/drawn_line.dart';
-import 'storage/flyers_storage_interface.dart';
 import 'utils/logger.dart';
 
 void main() async {
@@ -26,7 +26,7 @@ void main() async {
   // Setup Logger
   setupLogger();
 
-  // Initialize Hive
+  // Initialize Hive for Flutter
   await Hive.initFlutter();
 
   // Register Hive adapters with unique typeIds
@@ -37,44 +37,39 @@ void main() async {
   // Open Hive boxes
   await Hive.openBox<Product>('productsBox');
   await Hive.openBox<Store>('flyersBox');
-  await Hive.openBox<List<DrawnLine>>('drawingsBox'); // Open drawingsBox instead of likesBox
+  await Hive.openBox<List<DrawnLine>>('drawingsBox');
 
-  // Initialize Storage
-  StorageInterface productStorage = await StorageFactory.getProductStorage('productsBox');
-  FlyersStorageInterface flyersStorage = await StorageFactory.getFlyersStorage('flyersBox');
-  // Removed likesStorage initialization
-  // LikesStorageInterface likesStorage = await StorageFactory.getLikesStorage('likesBox');
+  // Initialize DrawingStorageInterface directly
+  final drawingsBox = Hive.box<List<DrawnLine>>('drawingsBox');
+  final drawingStorage = HiveDrawingStorage(drawingsBox: drawingsBox);
+
+  // Initialize ProductStorage
+  final productBox = Hive.box<Product>('productsBox');
+  final productStorage = HiveStorage<Product>(box: productBox);
+
+  // Initialize FlyersStorage
+  final flyersBox = Hive.box<Store>('flyersBox');
+  final flyersStorage = FlyersStorage(flyersBox: flyersBox);
 
   // Initialize Repositories
-  ProductRepository productRepository = ProductRepository(
+  final productRepository = ProductRepository(
     httpClient: http.Client(),
     storage: productStorage,
   );
 
-  FlyersRepository flyersRepository = FlyersRepository(
+  final flyersRepository = FlyersRepository(
     httpClient: http.Client(),
     storage: flyersStorage,
   );
-
-  // Removed LikesRepository initialization
-  // LikesRepository likesRepository = LikesRepository(
-  //   storage: likesStorage,
-  // );
 
   runApp(
     MultiProvider(
       providers: [
         Provider<ProductRepository>.value(value: productRepository),
         Provider<FlyersRepository>.value(value: flyersRepository),
-        // Removed Provider<LikesRepository>
-        // Provider<LikesRepository>.value(value: likesRepository),
-        // Removed BlocProvider<LikesBloc>
-        // BlocProvider<LikesBloc>(
-        //   create: (context) => LikesBloc(repository: likesRepository)..add(LoadLikesEvent()),
-        // ),
-        // Added BlocProvider<DrawingBloc>
+        Provider<DrawingStorageInterface>.value(value: drawingStorage),
         BlocProvider<DrawingBloc>(
-          create: (context) => DrawingBloc()..add(LoadDrawingsEvent()),
+          create: (context) => DrawingBloc(drawingStorage: drawingStorage),
         ),
         // Add other providers here if needed
       ],
@@ -151,8 +146,8 @@ class _HomePageState extends State<HomePage> {
 
   // Initialize the pages once to preserve their state
   late final List<Widget> _pages = [
-    MarketPage(),
-    FlyersPage(),
+    const MarketPage(),
+    const FlyersPage(),
   ];
 
   void _onItemTapped(int index) {
@@ -186,12 +181,6 @@ class _HomePageState extends State<HomePage> {
         selectedItemColor: Colors.blue, // Customize as needed
         onTap: _onItemTapped,
       ),
-      // Removed floatingActionButton as likes feature is removed
-      // floatingActionButton: FloatingActionButton(
-      //   onPressed: _openLikesDrawer,
-      //   tooltip: 'Likes',
-      //   child: const Icon(Icons.pets),
-      // ),
     );
   }
 }

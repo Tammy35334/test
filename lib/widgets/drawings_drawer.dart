@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/drawing_bloc.dart';
 import '../blocs/drawing_state.dart';
-import '../models/drawing.dart';
+import '../models/drawn_line.dart';
 
 class DrawingsDrawer extends StatelessWidget {
   final String imageId;
@@ -27,13 +27,10 @@ class DrawingsDrawer extends StatelessWidget {
       ),
       child: BlocBuilder<DrawingBloc, DrawingState>(
         builder: (context, state) {
-          if (state is DrawingLoading) {
+          if (state is DrawingInitial) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is DrawingLoaded) {
-            // Filter drawings for the current image
-            List<Drawing> currentDrawings = state.drawings
-                .where((drawing) => drawing.imageId == imageId)
-                .toList();
+            final List<DrawnLine> currentDrawings = state.drawings;
 
             if (currentDrawings.isEmpty) {
               return const Center(child: Text('No drawings yet.'));
@@ -43,19 +40,28 @@ class DrawingsDrawer extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               itemCount: currentDrawings.length,
               itemBuilder: (context, index) {
-                final Drawing drawing = currentDrawings[index];
+                final DrawnLine drawing = currentDrawings[index];
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.circle, color: Colors.blue, size: 20),
-                      const SizedBox(height: 4),
-                      Text(
-                        '(${drawing.center.dx.toStringAsFixed(1)}, ${drawing.center.dy.toStringAsFixed(1)})',
-                        style: const TextStyle(fontSize: 12),
-                      ),
-                    ],
+                  child: GestureDetector(
+                    onTap: () {
+                      // Optionally, implement functionality to navigate to a specific drawing
+                    },
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.brush, color: Colors.blue, size: 24),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Drawing ${index + 1}',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        Text(
+                          '${drawing.points.length ~/ 2} points',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               },

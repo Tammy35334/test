@@ -8,9 +8,12 @@ import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter/rendering.dart'; // For RepaintBoundary
 import 'dart:ui'; // For ImageByteFormat
-import 'package:hive/hive.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../models/drawn_line.dart'; // Import the DrawnLine model
 import '../utils/logger.dart'; // Logger for logging
+import '../blocs/drawing_bloc.dart';
+import '../blocs/drawing_event.dart';
+import '../blocs/drawing_state.dart';
 
 /// Represents a single line drawn by the user.
 class DrawnLineData {
@@ -31,7 +34,7 @@ class DrawingPainter extends CustomPainter {
     for (var line in lines) {
       if (line.points.length > 1) {
         for (int i = 0; i < line.points.length - 1; i++) {
-          // No need to check for nulls since points are non-nullable
+          // Draw lines between consecutive points
           canvas.drawLine(line.points[i], line.points[i + 1], line.paint);
         }
       }
@@ -64,55 +67,36 @@ class FlyerDetailPage extends StatefulWidget {
 class _FlyerDetailPageState extends State<FlyerDetailPage> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  final List<GlobalKey> _repaintKeys = [];
 
-  late final List<GlobalKey> _repaintKeys;
-  late final List<List<DrawnLineData>> _drawnLines;
-  late final List<List<Offset>> _currentPointsList;
+  // Temporary list to hold points during a drawing gesture
+  List<double> _tempPoints = [];
 
   @override
   void initState() {
     super.initState();
     _initializeRepaintKeys();
-    _initializeDrawnLines();
-    _initializeCurrentPointsList();
     _loadDrawings();
   }
 
   /// Initializes unique GlobalKeys for each RepaintBoundary.
   void _initializeRepaintKeys() {
-    _repaintKeys = List.generate(widget.flyerImages.length, (_) => GlobalKey());
-  }
-
-  /// Initializes empty lists to store drawn lines for each image.
-  void _initializeDrawnLines() {
-    _drawnLines = List.generate(widget.flyerImages.length, (_) => <DrawnLineData>[]);
-  }
-
-  /// Initializes empty lists to store current points being drawn for each image.
-  void _initializeCurrentPointsList() {
-    _currentPointsList = List.generate(widget.flyerImages.length, (_) => <Offset>[]);
-  }
-
-  /// Loads existing drawings from Hive.
-  Future<void> _loadDrawings() async {
-    final flyerDrawingsBox = Hive.box<List<DrawnLine>>('drawingsBox');
+    _repaintKeys.clear();
     for (int i = 0; i < widget.flyerImages.length; i++) {
-      List<DrawnLine>? storedLines = flyerDrawingsBox.get('${widget.imageId}_$i');
-      if (storedLines != null) {
-        setState(() {
-          _drawnLines[i] = storedLines
-              .map((line) => DrawnLineData(
-                    points: _deserializePoints(line.points),
-                    paint: Paint()
-                      ..color = Colors.blueAccent
-                      ..strokeWidth = 3.0
-                      ..strokeCap = StrokeCap.round
-                      ..style = PaintingStyle.stroke,
-                  ))
-              .toList();
-        });
-      }
+      _repaintKeys.add(GlobalKey());
     }
+  }
+
+  /// Loads existing drawings from the DrawingBloc for the initial page.
+  void _loadDrawings() {
+    if (widget.flyerImages.isNotEmpty) {
+      context.read<DrawingBloc>().add(LoadDrawingsEvent(imageId: _getImageKey(_currentPage)));
+    }
+  }
+
+  /// Generates a unique key for each image based on imageId and index.
+  String _getImageKey(int index) {
+    return '${widget.imageId}_$index';
   }
 
   /// Converts a flat list of doubles to a list of Offsets.
@@ -124,69 +108,14 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
     return offsets;
   }
 
-  /// Handles the start of a drawing gesture.
-  void _onPanStart(DragStartDetails details, int index) {
-    RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      Offset localPosition = renderBox.globalToLocal(details.globalPosition);
-      setState(() {
-        _currentPointsList[index].add(localPosition);
-      });
-    }
-  }
-
-  /// Handles the update of a drawing gesture.
-  void _onPanUpdate(DragUpdateDetails details, int index) {
-    RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
-    if (renderBox != null) {
-      Offset localPosition = renderBox.globalToLocal(details.globalPosition);
-      setState(() {
-        _currentPointsList[index].add(localPosition);
-      });
-    }
-  }
-
-  /// Handles the end of a drawing gesture.
-  void _onPanEnd(int index) {
-    if (_currentPointsList[index].isNotEmpty) {
-      final paint = Paint()
-        ..color = Colors.blueAccent
-        ..strokeWidth = 3.0
-        ..strokeCap = StrokeCap.round
-        ..style = PaintingStyle.stroke;
-
-      final drawnLine = DrawnLineData(points: List.from(_currentPointsList[index]), paint: paint);
-      setState(() {
-        _drawnLines[index].add(drawnLine);
-        _currentPointsList[index].clear();
-      });
-
-      // Save the updated drawings to Hive
-      _saveDrawings(index);
-    }
-  }
-
-  /// Saves the drawn lines for a specific image to Hive.
-  void _saveDrawings(int index) {
-    final flyerDrawingsBox = Hive.box<List<DrawnLine>>('drawingsBox');
-    List<DrawnLine> linesToSave = _drawnLines[index].map((line) {
-      return DrawnLine(
-        points: line.points.expand((offset) => [offset.dx, offset.dy]).toList(),
-      );
-    }).toList();
-
-    flyerDrawingsBox.put('${widget.imageId}_$index', linesToSave);
-    logger.info('Drawings saved for image index $index.');
-  }
-
   /// Shares the current image along with the drawings.
-  Future<void> _shareImageWithDrawings(int index) async {
+  Future<void> _shareImageWithDrawings() async {
     try {
-      logger.info('Sharing image with drawings for image index $index.');
+      logger.info('Sharing image with drawings for image index $_currentPage.');
 
       // Capture the image with drawings
       RenderRepaintBoundary? boundary =
-          _repaintKeys[index].currentContext?.findRenderObject() as RenderRepaintBoundary?;
+          _repaintKeys[_currentPage].currentContext?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) {
         throw Exception("Unable to find render object");
       }
@@ -214,7 +143,7 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
       // Save the compressed image temporarily
       final Directory tempDir = await getTemporaryDirectory();
       final File file = await File(
-        '${tempDir.path}/flyer_${widget.imageId}_$index.png',
+        '${tempDir.path}/flyer_${widget.imageId}_$_currentPage.png',
       ).create();
       await file.writeAsBytes(compressedBytes);
 
@@ -225,14 +154,14 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
         subject: 'Flyer from ${widget.storeName}',
       );
 
-      logger.info('Image shared successfully for image index $index.');
+      logger.info('Image shared successfully for image index $_currentPage.');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Flyer shared successfully!')),
         );
       }
     } catch (e) {
-      logger.severe('Error sharing image at index $index: $e');
+      logger.severe('Error sharing image at index $_currentPage: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error sharing image: $e')),
@@ -245,6 +174,14 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  /// Handles page change to load corresponding drawings.
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentPage = index;
+    });
+    context.read<DrawingBloc>().add(LoadDrawingsEvent(imageId: _getImageKey(index)));
   }
 
   @override
@@ -263,51 +200,109 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share, color: Colors.black),
-            onPressed: () {
-              // Share the current image
-              _shareImageWithDrawings(_currentPage);
-            },
+            onPressed: _shareImageWithDrawings,
             tooltip: 'Share',
           ),
         ],
       ),
-      body: PageView.builder(
-        controller: _pageController,
-        scrollDirection: Axis.vertical, // Vertical scrolling
-        itemCount: widget.flyerImages.length,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-          // Implement logic to detect if the image URL has changed and clear drawings
-          // For example:
-          // String newImageUrl = getNewImageUrlSomehow();
-          // _clearDrawingsIfImageChanged(index, newImageUrl);
-        },
-        itemBuilder: (context, index) {
-          return RepaintBoundary(
-            key: _repaintKeys[index],
-            child: GestureDetector(
-              onPanStart: (details) => _onPanStart(details, index),
-              onPanUpdate: (details) => _onPanUpdate(details, index),
-              onPanEnd: (_) => _onPanEnd(index),
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: Image.network(
-                      widget.flyerImages[index],
-                      fit: BoxFit.contain,
+      body: BlocBuilder<DrawingBloc, DrawingState>(
+        builder: (context, state) {
+          List<DrawnLineData> currentDrawings = [];
+          if (state is DrawingLoaded) {
+            currentDrawings = state.drawings.map((line) {
+              return DrawnLineData(
+                points: _deserializePoints(line.points),
+                paint: Paint()
+                  ..color = Colors.blueAccent
+                  ..strokeWidth = 3.0
+                  ..strokeCap = StrokeCap.round
+                  ..style = PaintingStyle.stroke,
+              );
+            }).toList();
+          }
+
+          return PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical, // Vertical scrolling
+            itemCount: widget.flyerImages.length,
+            onPageChanged: _onPageChanged,
+            itemBuilder: (context, index) {
+              return InteractiveViewer(
+                boundaryMargin: const EdgeInsets.all(20.0),
+                minScale: 1.0,
+                maxScale: 5.0,
+                child: Center(
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.95,
+                    child: RepaintBoundary(
+                      key: _repaintKeys[index],
+                      child: GestureDetector(
+                        onPanStart: (details) => _onPanStart(details, index),
+                        onPanUpdate: (details) => _onPanUpdate(details, index),
+                        onPanEnd: (_) => _onPanEnd(index),
+                        child: Stack(
+                          children: [
+                            Positioned.fill(
+                              child: Image.network(
+                                widget.flyerImages[index],
+                                fit: BoxFit.contain,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return const Center(child: CircularProgressIndicator());
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return const Center(child: Icon(Icons.broken_image, size: 50));
+                                },
+                              ),
+                            ),
+                            CustomPaint(
+                              painter: DrawingPainter(lines: currentDrawings),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
-                  CustomPaint(
-                    painter: DrawingPainter(lines: _drawnLines[index]),
-                  ),
-                ],
-              ),
-            ),
+                ),
+              );
+            },
           );
         },
       ),
     );
+  }
+
+  /// Handles the start of a drawing gesture.
+  void _onPanStart(DragStartDetails details, int index) {
+    RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+      _tempPoints = [localPosition.dx, localPosition.dy];
+    }
+  }
+
+  /// Handles the update of a drawing gesture.
+  void _onPanUpdate(DragUpdateDetails details, int index) {
+    RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+      setState(() {
+        _tempPoints.add(localPosition.dx);
+        _tempPoints.add(localPosition.dy);
+      });
+    }
+  }
+
+  /// Handles the end of a drawing gesture.
+  void _onPanEnd(int index) {
+    if (_tempPoints.length > 2) {
+      // Create a DrawnLine with the accumulated points
+      DrawnLine drawnLine = DrawnLine(points: List.from(_tempPoints));
+      context.read<DrawingBloc>().add(AddDrawingEvent(
+            imageId: _getImageKey(index),
+            drawnLine: drawnLine,
+          ));
+    }
+    _tempPoints = [];
   }
 }

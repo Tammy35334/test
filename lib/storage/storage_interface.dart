@@ -1,8 +1,10 @@
 // lib/storage/storage_interface.dart
 
-import '../models/product.dart';
+import 'package:hive/hive.dart';
 
-abstract class StorageInterface {
-  Future<void> cacheProducts(List<Product> products);
-  Future<List<Product>> getCachedProducts();
+abstract class StorageInterface<T extends HiveObject> {
+  Future<void> addItem(T item);
+  Future<void> updateItem(T item);
+  Future<void> deleteItem(String id);
+  Future<List<T>> getAllItems();
 }

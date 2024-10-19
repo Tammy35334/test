@@ -1,37 +1,50 @@
 // lib/blocs/drawing_bloc.dart
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../models/drawn_line.dart';
+import '../storage/drawing_storage_interface.dart';
 import 'drawing_event.dart';
 import 'drawing_state.dart';
-import '../models/drawing.dart';
-import 'package:hive/hive.dart';
+import '../utils/logger.dart';
 
 class DrawingBloc extends Bloc<DrawingEvent, DrawingState> {
-  DrawingBloc() : super(DrawingInitial()) {
+  final DrawingStorageInterface drawingStorage;
+
+  DrawingBloc({required this.drawingStorage}) : super(DrawingInitial()) {
     on<LoadDrawingsEvent>(_onLoadDrawings);
     on<AddDrawingEvent>(_onAddDrawing);
-    on<RemoveDrawingEvent>(_onRemoveDrawing);
+    on<ClearDrawingsEvent>(_onClearDrawings);
   }
 
-  final Box<Drawing> _drawingBox = Hive.box<Drawing>('drawingsBox');
-
-  void _onLoadDrawings(LoadDrawingsEvent event, Emitter<DrawingState> emit) {
-    emit(DrawingLoading());
+  Future<void> _onLoadDrawings(LoadDrawingsEvent event, Emitter<DrawingState> emit) async {
     try {
-      final drawings = _drawingBox.values.toList();
+      final drawings = await drawingStorage.getDrawings(event.imageId);
       emit(DrawingLoaded(drawings: drawings));
+      logger.info('Loaded ${drawings.length} drawings for imageId: ${event.imageId}');
     } catch (e) {
       emit(DrawingError(message: e.toString()));
+      logger.severe('Error loading drawings: $e');
     }
   }
 
-  void _onAddDrawing(AddDrawingEvent event, Emitter<DrawingState> emit) {
-    _drawingBox.put(event.drawing.id, event.drawing);
-    add(LoadDrawingsEvent());
+  Future<void> _onAddDrawing(AddDrawingEvent event, Emitter<DrawingState> emit) async {
+    if (state is DrawingLoaded) {
+      final currentDrawings = List<DrawnLine>.from((state as DrawingLoaded).drawings);
+      currentDrawings.add(event.drawnLine);
+      await drawingStorage.saveDrawings(event.imageId, currentDrawings);
+      emit(DrawingLoaded(drawings: currentDrawings));
+      logger.info('Added a drawing for imageId: ${event.imageId}');
+    }
   }
 
-  void _onRemoveDrawing(RemoveDrawingEvent event, Emitter<DrawingState> emit) {
-    _drawingBox.delete(event.drawingId);
-    add(LoadDrawingsEvent());
+  Future<void> _onClearDrawings(ClearDrawingsEvent event, Emitter<DrawingState> emit) async {
+    try {
+      await drawingStorage.clearDrawings(event.imageId);
+      emit(const DrawingLoaded(drawings: []));
+      logger.info('Cleared drawings for imageId: ${event.imageId}');
+    } catch (e) {
+      emit(DrawingError(message: e.toString()));
+      logger.severe('Error clearing drawings: $e');
+    }
   }
 }

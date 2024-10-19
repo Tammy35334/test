@@ -1,22 +1,30 @@
 // lib/storage/hive_storage.dart
 
 import 'package:hive/hive.dart';
-import '../models/product.dart';
-import 'storage_interface.dart';
+import '../storage/storage_interface.dart';
 
-class HiveStorage implements StorageInterface {
-  final Box<Product> productsBox;
+class HiveStorage<T extends HiveObject> implements StorageInterface<T> {
+  final Box<T> box;
 
-  HiveStorage({required this.productsBox});
+  HiveStorage({required this.box});
 
   @override
-  Future<void> cacheProducts(List<Product> products) async {
-    final Map<int, Product> productsMap = { for (var p in products) p.id : p };
-    await productsBox.putAll(productsMap);
+  Future<void> addItem(T item) async {
+    await box.put(item.key, item);
   }
 
   @override
-  Future<List<Product>> getCachedProducts() async {
-    return productsBox.values.toList();
+  Future<void> updateItem(T item) async {
+    await item.save();
+  }
+
+  @override
+  Future<void> deleteItem(String id) async {
+    await box.delete(id);
+  }
+
+  @override
+  Future<List<T>> getAllItems() async {
+    return box.values.toList();
   }
 }

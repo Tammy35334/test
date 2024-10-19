@@ -17,7 +17,7 @@ class StoreAdapter extends TypeAdapter<Store> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Store(
-      storeId: fields[0] as int,
+      storeId: fields[0] as String,
       storeName: fields[1] as String,
       province: fields[2] as String,
       flyerImages: (fields[3] as List).cast<String>(),
@@ -48,23 +48,3 @@ class StoreAdapter extends TypeAdapter<Store> {
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-Store _$StoreFromJson(Map<String, dynamic> json) => Store(
-      storeId: (json['storeId'] as num).toInt(),
-      storeName: json['storeName'] as String,
-      province: json['province'] as String,
-      flyerImages: (json['flyerImages'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-    );
-
-Map<String, dynamic> _$StoreToJson(Store instance) => <String, dynamic>{
-      'storeId': instance.storeId,
-      'storeName': instance.storeName,
-      'province': instance.province,
-      'flyerImages': instance.flyerImages,
-    };

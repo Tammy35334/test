@@ -1,7 +1,7 @@
 // lib/blocs/drawing_state.dart
 
 import 'package:equatable/equatable.dart';
-import '../models/drawing.dart';
+import '../models/drawn_line.dart';
 
 abstract class DrawingState extends Equatable {
   const DrawingState();
@@ -12,10 +12,10 @@ abstract class DrawingState extends Equatable {
 
 class DrawingInitial extends DrawingState {}
 
-class DrawingLoading extends DrawingState {}
+class DrawingLoading extends DrawingState {} // Added
 
 class DrawingLoaded extends DrawingState {
-  final List<Drawing> drawings;
+  final List<DrawnLine> drawings;
 
   const DrawingLoaded({required this.drawings});
 

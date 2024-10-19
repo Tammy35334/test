@@ -5,4 +5,7 @@ import '../models/store.dart';
 abstract class FlyersStorageInterface {
   Future<void> cacheFlyers(List<Store> flyers);
   Future<List<Store>> getCachedFlyers();
+  Future<void> addFlyer(Store flyer);
+  Future<void> updateFlyer(Store flyer);
+  Future<void> deleteFlyer(String id);
 }

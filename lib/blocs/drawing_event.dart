@@ -1,7 +1,7 @@
 // lib/blocs/drawing_event.dart
 
 import 'package:equatable/equatable.dart';
-import '../models/drawing.dart';
+import '../models/drawn_line.dart';
 
 abstract class DrawingEvent extends Equatable {
   const DrawingEvent();
@@ -10,22 +10,30 @@ abstract class DrawingEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadDrawingsEvent extends DrawingEvent {}
+class LoadDrawingsEvent extends DrawingEvent {
+  final String imageId;
 
-class AddDrawingEvent extends DrawingEvent {
-  final Drawing drawing;
-
-  const AddDrawingEvent({required this.drawing});
+  const LoadDrawingsEvent({required this.imageId});
 
   @override
-  List<Object?> get props => [drawing];
+  List<Object?> get props => [imageId];
 }
 
-class RemoveDrawingEvent extends DrawingEvent {
-  final String drawingId;
+class AddDrawingEvent extends DrawingEvent {
+  final String imageId;
+  final DrawnLine drawnLine;
 
-  const RemoveDrawingEvent({required this.drawingId});
+  const AddDrawingEvent({required this.imageId, required this.drawnLine});
 
   @override
-  List<Object?> get props => [drawingId];
+  List<Object?> get props => [imageId, drawnLine];
+}
+
+class ClearDrawingsEvent extends DrawingEvent {
+  final String imageId;
+
+  const ClearDrawingsEvent({required this.imageId});
+
+  @override
+  List<Object?> get props => [imageId];
 }

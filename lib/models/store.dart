@@ -1,15 +1,13 @@
 // lib/models/store.dart
 
 import 'package:hive/hive.dart';
-import 'package:json_annotation/json_annotation.dart';
 
 part 'store.g.dart';
 
 @HiveType(typeId: 1)
-@JsonSerializable()
 class Store extends HiveObject {
   @HiveField(0)
-  final int storeId;
+  final String storeId;
 
   @HiveField(1)
   final String storeName;
@@ -27,7 +25,19 @@ class Store extends HiveObject {
     required this.flyerImages,
   });
 
-  factory Store.fromJson(Map<String, dynamic> json) => _$StoreFromJson(json);
+  factory Store.fromJson(Map<String, dynamic> json) {
+    return Store(
+      storeId: json['storeId'] as String,
+      storeName: json['storeName'] as String,
+      province: json['province'] as String,
+      flyerImages: List<String>.from(json['flyerImages'] ?? []),
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$StoreToJson(this);
+  Map<String, dynamic> toJson() => {
+        'storeId': storeId,
+        'storeName': storeName,
+        'province': province,
+        'flyerImages': flyerImages,
+      };
 }
