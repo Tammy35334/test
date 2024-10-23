@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/product.dart';
 import '../storage/storage_interface.dart';
-import '../utils/logger.dart'; // Import the logger
+import '../utils/logger.dart';
 
 class ProductRepository {
   final http.Client httpClient;
@@ -12,15 +12,15 @@ class ProductRepository {
 
   ProductRepository({required this.httpClient, required this.storage});
 
-  // Fetch products from the API
+  // Fetch products from the API with pagination
   Future<List<Product>> fetchProducts({
     required int page,
     required int limit,
     String? query,
   }) async {
     // Update the API endpoint as needed
-    String url =
-        'https://tammy35334.github.io/test/products.json?page=$page&limit=$limit';
+    String baseUrl = 'https://tammy35334.github.io/test/products.json';
+    String url = '$baseUrl?page=$page&limit=$limit';
 
     if (query != null && query.isNotEmpty) {
       // If your API supports search queries, append them here

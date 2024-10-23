@@ -4,7 +4,7 @@ part of 'flyers_bloc.dart';
 
 abstract class FlyersState extends Equatable {
   const FlyersState();
-  
+
   @override
   List<Object> get props => [];
 }
@@ -22,6 +22,8 @@ class FlyersLoaded extends FlyersState {
   @override
   List<Object> get props => [flyers, hasReachedMax];
 }
+
+class FlyersDeleted extends FlyersState {}
 
 class FlyersError extends FlyersState {
   final String message;

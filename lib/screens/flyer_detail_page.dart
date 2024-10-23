@@ -5,15 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter/rendering.dart'; // For RepaintBoundary
 import 'dart:ui'; // For ImageByteFormat
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/drawn_line.dart'; // Import the DrawnLine model
+import '../models/drawn_line.dart';
 import '../utils/logger.dart'; // Logger for logging
 import '../blocs/drawing_bloc.dart';
 import '../blocs/drawing_event.dart';
 import '../blocs/drawing_state.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:async';
 
 /// Represents a single line drawn by the user.
 class DrawnLineData {
@@ -42,14 +45,14 @@ class DrawingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(DrawingPainter oldDelegate) => true;
+  bool shouldRepaint(DrawingPainter oldDelegate) => oldDelegate.lines != lines;
 }
 
 /// The main page where users can view and draw on flyer images.
 class FlyerDetailPage extends StatefulWidget {
   final List<String> flyerImages; // List of image URLs
   final String storeName;
-  final String imageId; // Unique identifier for the store
+  final int imageId; // Changed from String to int
 
   const FlyerDetailPage({
     super.key,
@@ -71,6 +74,9 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
 
   // Temporary list to hold points during a drawing gesture
   List<double> _tempPoints = [];
+
+  Timer? _debounceTimer;
+  final int _debounceDuration = 16; // Approx. 60 FPS
 
   @override
   void initState() {
@@ -172,6 +178,7 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _pageController.dispose();
     super.dispose();
   }
@@ -243,16 +250,11 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
                         child: Stack(
                           children: [
                             Positioned.fill(
-                              child: Image.network(
-                                widget.flyerImages[index],
+                              child: CachedNetworkImage(
+                                imageUrl: widget.flyerImages[index],
                                 fit: BoxFit.contain,
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return const Center(child: CircularProgressIndicator());
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Center(child: Icon(Icons.broken_image, size: 50));
-                                },
+                                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) => const Center(child: Icon(Icons.broken_image, size: 50)),
                               ),
                             ),
                             CustomPaint(
@@ -281,8 +283,11 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
     }
   }
 
-  /// Handles the update of a drawing gesture.
+  /// Handles the update of a drawing gesture with debounce.
   void _onPanUpdate(DragUpdateDetails details, int index) {
+    if (_debounceTimer?.isActive ?? false) return;
+    _debounceTimer = Timer(Duration(milliseconds: _debounceDuration), () {});
+
     RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       Offset localPosition = renderBox.globalToLocal(details.globalPosition);
@@ -295,7 +300,7 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
 
   /// Handles the end of a drawing gesture.
   void _onPanEnd(int index) {
-    if (_tempPoints.length > 2) {
+    if (_tempPoints.length > 4) { // Ensure at least two points
       // Create a DrawnLine with the accumulated points
       DrawnLine drawnLine = DrawnLine(points: List.from(_tempPoints));
       context.read<DrawingBloc>().add(AddDrawingEvent(

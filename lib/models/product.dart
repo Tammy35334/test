@@ -7,28 +7,33 @@ part 'product.g.dart';
 @HiveType(typeId: 0)
 class Product extends HiveObject {
   @HiveField(0)
-  final String id;
+  final int id; // Changed from String to int
 
   @HiveField(1)
   final String name;
 
   @HiveField(2)
-  final double price;
+  final String description;
 
   @HiveField(3)
+  final double price;
+
+  @HiveField(4)
   final String imageUrl;
 
   Product({
     required this.id,
     required this.name,
+    required this.description,
     required this.price,
     required this.imageUrl,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] as String,
+      id: json['id'] as int,
       name: json['name'] as String,
+      description: json['description'] as String,
       price: (json['price'] as num).toDouble(),
       imageUrl: json['imageUrl'] as String,
     );
@@ -37,6 +42,7 @@ class Product extends HiveObject {
   Map<String, dynamic> toJson() => {
         'id': id,
         'name': name,
+        'description': description,
         'price': price,
         'imageUrl': imageUrl,
       };

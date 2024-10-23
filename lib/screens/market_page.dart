@@ -4,10 +4,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:flutter/cupertino.dart'; // For iOS-like widgets
+import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../blocs/product_bloc.dart';
 import '../models/product.dart';
@@ -29,12 +29,13 @@ class MarketPageState extends State<MarketPage> {
 
   late final ProductBloc _productBloc;
 
+  //static const int _pageSize = 20;
+
   @override
   void initState() {
     super.initState();
     final productRepository = Provider.of<ProductRepository>(context, listen: false);
     _productBloc = ProductBloc(repository: productRepository);
-    // Load cached products if available
     _loadCachedProducts();
   }
 
@@ -144,20 +145,22 @@ class MarketPageState extends State<MarketPage> {
           setState(() {
             _searchQuery = '';
           });
-          _onSearchChanged('');
+          _productBloc.add(SearchProductsEvent(query: ''));
         },
-        placeholder: 'Search items',
+        placeholder: 'Search products',
       ),
     );
   }
 
   Widget _buildProductList() {
-    return PagedSliverList<int, Product>(
-      pagingController: _productBloc.pagingController,
+    return PagedListView<int, Product>(
+      pagingController: _productBloc.pagingController, // Corrected Access
       builderDelegate: PagedChildBuilderDelegate<Product>(
         itemBuilder: (context, item, index) => ProductListItem(product: item),
         firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
-          error: (_productBloc.pagingController.error as Exception).toString(),
+          error: (_productBloc.pagingController.error != null)
+              ? _productBloc.pagingController.error.toString()
+              : 'Unknown Error',
           onTryAgain: () => _productBloc.pagingController.refresh(),
         ),
         noItemsFoundIndicatorBuilder: (context) => const EmptyListIndicator(),
@@ -177,12 +180,12 @@ class MarketPageState extends State<MarketPage> {
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(child: _buildTopBar()),
-                SliverToBoxAdapter(child: SizedBox(height: 8.0)),
+                SliverToBoxAdapter(child: const SizedBox(height: 8.0)),
                 SliverToBoxAdapter(child: _buildImageSection()),
-                SliverToBoxAdapter(child: SizedBox(height: 16.0)),
+                SliverToBoxAdapter(child: const SizedBox(height: 16.0)),
                 SliverToBoxAdapter(child: _buildSearchBar()),
-                SliverToBoxAdapter(child: SizedBox(height: 16.0)),
-                _buildProductList(),
+                SliverToBoxAdapter(child: const SizedBox(height: 16.0)),
+                SliverFillRemaining(child: _buildProductList()),
               ],
             ),
           ),

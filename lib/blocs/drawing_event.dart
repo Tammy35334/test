@@ -5,7 +5,7 @@ import '../models/drawn_line.dart';
 
 abstract class DrawingEvent extends Equatable {
   const DrawingEvent();
-
+  
   @override
   List<Object?> get props => [];
 }

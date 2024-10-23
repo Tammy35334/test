@@ -26,8 +26,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   String currentQuery = '';
 
-  Future<void> _onFetchProducts(
-      FetchProductsEvent event, Emitter<ProductState> emit) async {
+  Future<void> _onFetchProducts(FetchProductsEvent event, Emitter<ProductState> emit) async {
     try {
       final products = await repository.fetchProducts(
         page: event.page,
@@ -41,14 +40,14 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         final nextPageKey = event.page + 1;
         pagingController.appendPage(products, nextPageKey);
       }
+      emit(ProductLoaded(products: products, hasReachedMax: isLastPage));
     } catch (e) {
       pagingController.error = e;
       emit(ProductError(message: e.toString()));
     }
   }
 
-  Future<void> _onSearchProducts(
-      SearchProductsEvent event, Emitter<ProductState> emit) async {
+  Future<void> _onSearchProducts(SearchProductsEvent event, Emitter<ProductState> emit) async {
     currentQuery = event.query;
     pagingController.refresh();
   }

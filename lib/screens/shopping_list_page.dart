@@ -1,10 +1,6 @@
 // lib/screens/shopping_list_page.dart
 
 import 'package:flutter/material.dart';
-// ignore: unused_import
-import '../widgets/error_indicator.dart';
-// ignore: unused_import
-import '../widgets/empty_list_indicator.dart';
 
 class ShoppingListPage extends StatelessWidget {
   const ShoppingListPage({super.key});

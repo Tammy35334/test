@@ -12,7 +12,6 @@ class StoreListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      // Removed leading image
       title: Text(
         store.storeName,
         style: TextStyle(
@@ -47,7 +46,7 @@ class StoreListItem extends StatelessWidget {
               builder: (context) => FlyerDetailPage(
                 flyerImages: store.flyerImages, // Passing the list of images
                 storeName: store.storeName,
-                imageId: store.storeId.toString(), // Passing the required imageId
+                imageId: store.storeId, // Passing the required imageId as int
               ),
             ),
           );

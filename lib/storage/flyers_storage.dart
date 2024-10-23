@@ -12,7 +12,7 @@ class FlyersStorage implements FlyersStorageInterface {
 
   @override
   Future<void> cacheFlyers(List<Store> flyers) async {
-    final Map<String, Store> flyersMap = { for (var f in flyers) f.storeId : f };
+    final Map<int, Store> flyersMap = { for (var f in flyers) f.storeId : f };
     await flyersBox.putAll(flyersMap);
     logger.info('Cached ${flyers.length} flyers.');
   }
@@ -35,8 +35,13 @@ class FlyersStorage implements FlyersStorageInterface {
   }
 
   @override
-  Future<void> deleteFlyer(String id) async {
-    await flyersBox.delete(id);
-    logger.info('Deleted flyer with id: $id');
+  Future<void> deleteFlyer(int id) async {
+    try {
+      await flyersBox.delete(id);
+      logger.info('Deleted flyer with id: $id');
+    } catch (e) {
+      logger.severe('Error deleting flyer from Hive: $e');
+      throw Exception('Error deleting flyer from Hive: $e');
+    }
   }
 }

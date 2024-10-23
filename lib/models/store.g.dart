@@ -17,7 +17,7 @@ class StoreAdapter extends TypeAdapter<Store> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Store(
-      storeId: fields[0] as String,
+      storeId: fields[0] as int,
       storeName: fields[1] as String,
       province: fields[2] as String,
       flyerImages: (fields[3] as List).cast<String>(),

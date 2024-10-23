@@ -11,8 +11,6 @@ abstract class ProductState extends Equatable {
 
 class ProductInitial extends ProductState {}
 
-class ProductLoading extends ProductState {}
-
 class ProductLoaded extends ProductState {
   final List<Product> products;
   final bool hasReachedMax;

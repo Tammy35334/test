@@ -7,5 +7,5 @@ abstract class FlyersStorageInterface {
   Future<List<Store>> getCachedFlyers();
   Future<void> addFlyer(Store flyer);
   Future<void> updateFlyer(Store flyer);
-  Future<void> deleteFlyer(String id);
+  Future<void> deleteFlyer(int id); // Changed from String to int
 }

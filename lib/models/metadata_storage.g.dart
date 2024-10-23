@@ -1,41 +1,35 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'drawing.dart';
+part of 'metadata_storage.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class DrawingAdapter extends TypeAdapter<Drawing> {
+class MetadataAdapter extends TypeAdapter<Metadata> {
   @override
-  final int typeId = 3;
+  final int typeId = 4;
 
   @override
-  Drawing read(BinaryReader reader) {
+  Metadata read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return Drawing(
-      id: fields[0] as String,
-      imageId: fields[1] as String,
-      centerX: fields[2] as double,
-      centerY: fields[3] as double,
+    return Metadata(
+      key: fields[0] as String,
+      timestamp: fields[1] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, Drawing obj) {
+  void write(BinaryWriter writer, Metadata obj) {
     writer
-      ..writeByte(4)
-      ..writeByte(0)
-      ..write(obj.id)
-      ..writeByte(1)
-      ..write(obj.imageId)
       ..writeByte(2)
-      ..write(obj.centerX)
-      ..writeByte(3)
-      ..write(obj.centerY);
+      ..writeByte(0)
+      ..write(obj.key)
+      ..writeByte(1)
+      ..write(obj.timestamp);
   }
 
   @override
@@ -44,7 +38,7 @@ class DrawingAdapter extends TypeAdapter<Drawing> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is DrawingAdapter &&
+      other is MetadataAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
