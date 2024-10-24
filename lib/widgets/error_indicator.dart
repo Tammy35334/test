@@ -6,22 +6,27 @@ class ErrorIndicator extends StatelessWidget {
   final String error;
   final VoidCallback onTryAgain;
 
-  const ErrorIndicator({super.key, required this.error, required this.onTryAgain});
+  const ErrorIndicator({
+    super.key,
+    required this.error,
+    required this.onTryAgain,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: 60, color: Colors.red),
-            const SizedBox(height: 16),
             Text(
               'An error occurred:\n$error',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(
+                color: Colors.red,
+                fontSize: 16,
+              ),
             ),
             const SizedBox(height: 16),
             ElevatedButton(

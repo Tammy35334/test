@@ -11,7 +11,7 @@ abstract class DrawingEvent extends Equatable {
 }
 
 class LoadDrawingsEvent extends DrawingEvent {
-  final String imageId;
+  final int imageId;
 
   const LoadDrawingsEvent({required this.imageId});
 
@@ -20,7 +20,7 @@ class LoadDrawingsEvent extends DrawingEvent {
 }
 
 class AddDrawingEvent extends DrawingEvent {
-  final String imageId;
+  final int imageId;
   final DrawnLine drawnLine;
 
   const AddDrawingEvent({required this.imageId, required this.drawnLine});
@@ -30,7 +30,7 @@ class AddDrawingEvent extends DrawingEvent {
 }
 
 class ClearDrawingsEvent extends DrawingEvent {
-  final String imageId;
+  final int imageId;
 
   const ClearDrawingsEvent({required this.imageId});
 

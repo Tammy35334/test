@@ -1,6 +1,6 @@
 // lib/blocs/drawing_bloc.dart
 
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bloc/bloc.dart';
 import '../models/drawn_line.dart';
 import '../storage/drawing_storage_interface.dart';
 import 'drawing_event.dart';

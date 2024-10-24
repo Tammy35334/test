@@ -3,58 +3,21 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/store.dart';
-import '../models/metadata_storage.dart';
-import '../storage/flyers_storage_interface.dart';
+import '../storage/flyers_storage.dart';
 import '../utils/logger.dart';
-import 'package:hive/hive.dart';
 
 class FlyersRepository {
   final http.Client httpClient;
-  final FlyersStorageInterface storage;
-  final Box<Metadata> metadataBox;
+  final FlyersStorage storage;
 
-  FlyersRepository({
-    required this.httpClient,
-    required this.storage,
-    required this.metadataBox,
-  });
+  FlyersRepository({required this.httpClient, required this.storage});
 
-  /// Fetches flyers with a data freshness check.
+  // Fetch flyers from the API
   Future<List<Store>> fetchFlyers() async {
-    final String metadataKey = 'flyers_last_fetch';
-    final Metadata? metadata = metadataBox.get(metadataKey);
+    // Update the API endpoint as needed
+    String url = 'https://tammy35334.github.io/test/flyers.json';
 
-    final bool shouldFetch = metadata == null ||
-        DateTime.now().difference(metadata.timestamp).inDays >= 7;
-
-    if (shouldFetch) {
-      logger.info('Fetching fresh flyers data from server.');
-      try {
-        final fetchedFlyers = await _fetchFlyersFromServer();
-        await storage.cacheFlyers(fetchedFlyers);
-        metadataBox.put(
-            metadataKey, Metadata(key: metadataKey, timestamp: DateTime.now()));
-        return fetchedFlyers;
-      } catch (e) {
-        logger.severe('Error fetching flyers: $e');
-        throw Exception('Error fetching flyers: $e');
-      }
-    } else {
-      logger.info('Using cached flyers data.');
-      try {
-        return await storage.getCachedFlyers();
-      } catch (e) {
-        logger.severe('Error retrieving cached flyers: $e');
-        throw Exception('Error retrieving cached flyers: $e');
-      }
-    }
-  }
-
-  /// Actual server fetching logic.
-  Future<List<Store>> _fetchFlyersFromServer() async {
-    final url = Uri.parse(
-        'https://tammy35334.github.io/test/flyers.json'); // Removed pagination params
-    final response = await httpClient.get(url);
+    final response = await httpClient.get(Uri.parse(url));
 
     if (response.statusCode != 200) {
       logger.severe('Error fetching flyers: ${response.statusCode}');
@@ -71,57 +34,50 @@ class FlyersRepository {
           .map((json) => Store.fromJson(json))
           .toList();
     } else {
-      logger.severe('Invalid JSON format');
-      throw Exception('Invalid JSON format');
+      logger.severe('Invalid JSON format for flyers');
+      throw Exception('Invalid JSON format for flyers');
     }
 
     logger.info('Parsed ${stores.length} stores from JSON.');
 
+    // Cache the fetched stores
+    await storage.cacheItems(stores);
+
+    logger.info('Cached ${stores.length} stores.');
+
     return stores;
   }
 
-  /// Retrieves cached flyers from Hive storage.
+  // Retrieve cached flyers
   Future<List<Store>> getCachedFlyers() async {
-    try {
-      final cachedFlyers = await storage.getCachedFlyers();
-      logger.info('Retrieved ${cachedFlyers.length} cached flyers.');
-      return cachedFlyers;
-    } catch (e) {
-      logger.severe('Error retrieving cached flyers: $e');
-      throw Exception('Error retrieving cached flyers: $e');
-    }
+    final cachedStores = await storage.getAllItems();
+    logger.info('Retrieved ${cachedStores.length} cached stores.');
+    return cachedStores;
   }
 
-  /// Adds a new flyer to Hive storage.
-  Future<void> addFlyer(Store flyer) async {
-    try {
-      await storage.addFlyer(flyer);
-      logger.info('Flyer added: ${flyer.storeName}');
-    } catch (e) {
-      logger.severe('Error adding flyer: $e');
-      throw Exception('Error adding flyer: $e');
-    }
+  // Search flyers in cached data
+  Future<List<Store>> searchFlyers({required String query}) async {
+    final allStores = await getCachedFlyers();
+    final filteredStores = allStores
+        .where((store) =>
+            store.storeName.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    logger.info('Found ${filteredStores.length} stores matching "$query".');
+    return filteredStores;
   }
 
-  /// Updates an existing flyer in Hive storage.
-  Future<void> updateFlyer(Store flyer) async {
-    try {
-      await storage.updateFlyer(flyer);
-      logger.info('Flyer updated: ${flyer.storeName}');
-    } catch (e) {
-      logger.severe('Error updating flyer: $e');
-      throw Exception('Error updating flyer: $e');
-    }
+  Future<void> addFlyer(Store store) async {
+    await storage.addItem(store);
+    logger.info('Store added: ${store.storeName}');
   }
 
-  /// Deletes a flyer from Hive storage.
+  Future<void> updateFlyer(Store store) async {
+    await storage.updateItem(store);
+    logger.info('Store updated: ${store.storeName}');
+  }
+
   Future<void> deleteFlyer(int id) async {
-    try {
-      await storage.deleteFlyer(id);
-      logger.info('Flyer deleted with id: $id');
-    } catch (e) {
-      logger.severe('Error deleting flyer: $e');
-      throw Exception('Error deleting flyer: $e');
-    }
+    await storage.deleteItem(id);
+    logger.info('Store deleted with id: $id');
   }
 }

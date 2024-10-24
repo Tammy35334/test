@@ -18,17 +18,15 @@ class ProductListItem extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
           child: CachedNetworkImage(
             imageUrl: product.imageUrl,
-            placeholder: (context, url) => Container(
+            placeholder: (context, url) => const SizedBox(
               width: 50,
               height: 50,
-              color: Colors.grey[300],
-              child: const Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
+              child: Center(child: CircularProgressIndicator(strokeWidth: 2.0)),
             ),
-            errorWidget: (context, url, error) => Container(
+            errorWidget: (context, url, error) => const SizedBox(
               width: 50,
               height: 50,
-              color: Colors.grey[300],
-              child: const Icon(Icons.error, color: Colors.red),
+              child: Icon(Icons.error, color: Colors.red),
             ),
             width: 50,
             height: 50,

@@ -13,11 +13,11 @@ class FetchFlyersEvent extends FlyersEvent {
   const FetchFlyersEvent();
 }
 
-class DeleteFlyerEvent extends FlyersEvent {
-  final int id;
+class SearchFlyersEvent extends FlyersEvent {
+  final String query;
 
-  const DeleteFlyerEvent({required this.id});
+  const SearchFlyersEvent({required this.query});
 
   @override
-  List<Object> get props => [id];
+  List<Object> get props => [query];
 }

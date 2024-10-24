@@ -7,7 +7,7 @@ part 'store.g.dart';
 @HiveType(typeId: 1)
 class Store extends HiveObject {
   @HiveField(0)
-  final int storeId; // ID as int
+  final int storeId; // Unique identifier for the store
 
   @HiveField(1)
   final String storeName;
@@ -16,7 +16,7 @@ class Store extends HiveObject {
   final String province;
 
   @HiveField(3)
-  final List<String> flyerImages;
+  final List<String> flyerImages; // List of flyer image URLs
 
   Store({
     required this.storeId,
@@ -27,10 +27,10 @@ class Store extends HiveObject {
 
   factory Store.fromJson(Map<String, dynamic> json) {
     return Store(
-      storeId: json['storeId'] as int, // Ensure ID is an int
+      storeId: json['storeId'] as int,
       storeName: json['storeName'] as String,
       province: json['province'] as String,
-      flyerImages: List<String>.from(json['flyerImages'] ?? []),
+      flyerImages: List<String>.from(json['flyerImages'] as List),
     );
   }
 

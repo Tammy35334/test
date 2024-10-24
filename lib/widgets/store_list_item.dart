@@ -11,51 +11,39 @@ class StoreListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        store.storeName,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 16,
-          fontWeight: FontWeight.w500,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white
-              : Colors.black87,
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: ListTile(
+        title: Text(
+          store.storeName,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-      subtitle: Text(
-        store.province,
-        style: TextStyle(
-          fontFamily: 'Roboto',
-          fontSize: 14,
-          color: Theme.of(context).brightness == Brightness.dark
-              ? Colors.white70
-              : Colors.black54,
-        ),
-      ),
-      trailing: const Icon(
-        Icons.arrow_forward_ios,
-        size: 16.0,
-        color: Colors.grey,
-      ),
-      onTap: () {
-        if (store.flyerImages.isNotEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => FlyerDetailPage(
-                flyerImages: store.flyerImages, // Passing the list of images
-                storeName: store.storeName,
-                imageId: store.storeId, // Passing the required imageId as int
+        subtitle: Text(store.province),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () {
+          if (store.flyerImages.isNotEmpty) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => FlyerDetailPage(
+                  flyerImages: store.flyerImages,
+                  storeName: store.storeName,
+                  storeId: store.storeId,
+                ),
               ),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No flyer images available for this store.')),
-          );
-        }
-      },
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('No flyers available for this store.')),
+            );
+          }
+        },
+      ),
     );
   }
 }

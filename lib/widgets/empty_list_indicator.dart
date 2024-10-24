@@ -9,8 +9,8 @@ class EmptyListIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Center(
       child: Text(
-        'No flyers found.',
-        style: TextStyle(fontSize: 18, color: Colors.grey),
+        'No items found.',
+        style: TextStyle(fontSize: 16, color: Colors.grey),
       ),
     );
   }

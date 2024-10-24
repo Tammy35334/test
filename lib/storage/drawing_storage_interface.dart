@@ -3,7 +3,7 @@
 import '../models/drawn_line.dart';
 
 abstract class DrawingStorageInterface {
-  Future<List<DrawnLine>> getDrawings(String imageId);
-  Future<void> saveDrawings(String imageId, List<DrawnLine> drawings);
-  Future<void> clearDrawings(String imageId);
+  Future<List<DrawnLine>> getDrawings(int imageId);
+  Future<void> saveDrawings(int imageId, List<DrawnLine> drawings);
+  Future<void> clearDrawings(int imageId);
 }

@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -27,12 +26,13 @@ class MarketPageState extends State<MarketPage> {
   String _searchQuery = '';
 
   late final ProductBloc _productBloc;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     final productRepository =
-        Provider.of<ProductRepository>(context, listen: false);
+        RepositoryProvider.of<ProductRepository>(context, listen: false);
     _productBloc = ProductBloc(repository: productRepository);
     _productBloc.add(const FetchProductsEvent());
     _loadCachedProducts();
@@ -51,6 +51,7 @@ class MarketPageState extends State<MarketPage> {
   void dispose() {
     _debounce?.cancel();
     _productBloc.close();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -138,10 +139,8 @@ class MarketPageState extends State<MarketPage> {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: CupertinoSearchTextField(
-        controller: TextEditingController(text: _searchQuery),
-        onChanged: (value) {
-          _onSearchChanged(value);
-        },
+        controller: _searchController,
+        onChanged: _onSearchChanged,
         onSubmitted: (value) {
           if (_searchQuery.isNotEmpty) {
             _productBloc.add(SearchProductsEvent(query: _searchQuery));
@@ -150,6 +149,7 @@ class MarketPageState extends State<MarketPage> {
           }
         },
         onSuffixTap: () {
+          _searchController.clear();
           setState(() {
             _searchQuery = '';
           });
@@ -171,16 +171,16 @@ class MarketPageState extends State<MarketPage> {
         : products;
 
     if (filteredProducts.isEmpty) {
-      return const EmptyListIndicator();
+      return const SliverToBoxAdapter(child: EmptyListIndicator());
     }
 
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: filteredProducts.length,
-      itemBuilder: (context, index) {
-        return ProductListItem(product: filteredProducts[index]);
-      },
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, index) {
+          return ProductListItem(product: filteredProducts[index]);
+        },
+        childCount: filteredProducts.length,
+      ),
     );
   }
 
@@ -193,37 +193,36 @@ class MarketPageState extends State<MarketPage> {
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _onRefresh,
-            child: SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              child: Column(
-                children: [
-                  _buildTopBar(),
-                  const SizedBox(height: 8.0),
-                  _buildImageSection(),
-                  const SizedBox(height: 16.0),
-                  _buildSearchBar(),
-                  const SizedBox(height: 16.0),
-                  BlocBuilder<ProductBloc, ProductState>(
-                    builder: (context, state) {
-                      if (state is ProductLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (state is ProductLoaded) {
-                        return _buildProductList(state.products);
-                      } else if (state is ProductError) {
-                        return ErrorIndicator(
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: _buildTopBar()),
+                const SliverToBoxAdapter(child: SizedBox(height: 8.0)),
+                SliverToBoxAdapter(child: _buildImageSection()),
+                const SliverToBoxAdapter(child: SizedBox(height: 16.0)),
+                SliverToBoxAdapter(child: _buildSearchBar()),
+                const SliverToBoxAdapter(child: SizedBox(height: 16.0)),
+                BlocBuilder<ProductBloc, ProductState>(
+                  builder: (context, state) {
+                    if (state is ProductLoading) {
+                      return const SliverToBoxAdapter(
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    } else if (state is ProductLoaded) {
+                      return _buildProductList(state.products);
+                    } else if (state is ProductError) {
+                      return SliverToBoxAdapter(
+                        child: ErrorIndicator(
                           error: state.message,
                           onTryAgain: () =>
                               _productBloc.add(const FetchProductsEvent()),
-                        );
-                      } else {
-                        return const SizedBox.shrink();
-                      }
-                    },
-                  ),
-                ],
-              ),
+                        ),
+                      );
+                    } else {
+                      return const SliverToBoxAdapter(child: SizedBox.shrink());
+                    }
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -256,6 +255,7 @@ class MarketPageState extends State<MarketPage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               TextField(
+                controller: TextEditingController(text: pincode),
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(hintText: 'Pincode'),
                 onChanged: (value) {

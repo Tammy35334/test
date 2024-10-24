@@ -18,7 +18,7 @@ class MetadataAdapter extends TypeAdapter<Metadata> {
     };
     return Metadata(
       key: fields[0] as String,
-      timestamp: fields[1] as DateTime,
+      value: fields[1] as String,
     );
   }
 
@@ -29,7 +29,7 @@ class MetadataAdapter extends TypeAdapter<Metadata> {
       ..writeByte(0)
       ..write(obj.key)
       ..writeByte(1)
-      ..write(obj.timestamp);
+      ..write(obj.value);
   }
 
   @override

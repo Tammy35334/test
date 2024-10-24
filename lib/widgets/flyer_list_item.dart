@@ -2,45 +2,42 @@
 
 import 'package:flutter/material.dart';
 import '../models/store.dart';
-import '../repositories/flyers_repository.dart';
-import 'package:provider/provider.dart';
+import '../screens/flyer_detail_page.dart';
 
-class FlyerListItem extends StatefulWidget {
+class FlyerListItem extends StatelessWidget {
   final Store flyer;
 
   const FlyerListItem({super.key, required this.flyer});
 
   @override
-  _FlyerListItemState createState() => _FlyerListItemState();
-}
-
-class _FlyerListItemState extends State<FlyerListItem> {
-  @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(widget.flyer.storeName),
-      subtitle: Text(widget.flyer.province),
-      trailing: IconButton(
-        icon: const Icon(Icons.delete, color: Colors.red),
-        onPressed: () async {
-          try {
-            await Provider.of<FlyersRepository>(context, listen: false)
-                .deleteFlyer(widget.flyer.storeId); // Pass int storeId
-            if (!mounted) return; // Ensure widget is still mounted
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Flyer deleted successfully')),
-            );
-          } catch (e) {
-            if (!mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error deleting flyer: $e')),
-            );
-          }
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+      child: ListTile(
+        title: Text(
+          flyer.storeName,
+          style: const TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        subtitle: Text(flyer.province),
+        trailing: const Icon(Icons.arrow_forward_ios),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => FlyerDetailPage(
+                flyerImages: flyer.flyerImages,
+                storeName: flyer.storeName,
+                storeId: flyer.storeId,
+              ),
+            ),
+          );
         },
       ),
-      onTap: () {
-        // Navigate to flyer details or perform other actions
-      },
     );
   }
 }

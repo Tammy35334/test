@@ -11,13 +11,13 @@ class HiveDrawingStorage implements DrawingStorageInterface {
   HiveDrawingStorage({required this.drawingsBox});
 
   @override
-  Future<void> clearDrawings(String imageId) async {
+  Future<void> clearDrawings(int imageId) async {
     await drawingsBox.delete(imageId);
     logger.info('Cleared drawings for imageId: $imageId');
   }
 
   @override
-  Future<List<DrawnLine>> getDrawings(String imageId) async {
+  Future<List<DrawnLine>> getDrawings(int imageId) async {
     final drawingsList = drawingsBox.get(imageId);
     if (drawingsList == null) {
       return [];
@@ -26,7 +26,7 @@ class HiveDrawingStorage implements DrawingStorageInterface {
   }
 
   @override
-  Future<void> saveDrawings(String imageId, List<DrawnLine> drawings) async {
+  Future<void> saveDrawings(int imageId, List<DrawnLine> drawings) async {
     await drawingsBox.put(imageId, drawings);
     logger.info('Saved ${drawings.length} drawings for imageId: $imageId');
   }

@@ -22,15 +22,6 @@ class FlyersLoaded extends FlyersState {
   List<Object> get props => [flyers];
 }
 
-class FlyerDeleted extends FlyersState {
-  final int id;
-
-  const FlyerDeleted({required this.id});
-
-  @override
-  List<Object> get props => [id];
-}
-
 class FlyersError extends FlyersState {
   final String message;
 

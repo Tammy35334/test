@@ -2,46 +2,44 @@
 
 import 'package:hive/hive.dart';
 import '../models/store.dart';
-import 'flyers_storage_interface.dart';
+import '../storage/storage_interface.dart';
 import '../utils/logger.dart';
 
-class FlyersStorage implements FlyersStorageInterface {
+class FlyersStorage implements StorageInterface<Store> {
   final Box<Store> flyersBox;
 
   FlyersStorage({required this.flyersBox});
 
   @override
-  Future<void> cacheFlyers(List<Store> flyers) async {
-    final Map<int, Store> flyersMap = {for (var f in flyers) f.storeId: f};
-    await flyersBox.putAll(flyersMap);
-    logger.info('Cached ${flyers.length} flyers.');
+  Future<void> addItem(Store item) async {
+    await flyersBox.put(item.storeId, item); // Use storeId as key
+    logger.info('Store added with ID: ${item.storeId}');
   }
 
   @override
-  Future<List<Store>> getCachedFlyers() async {
+  Future<void> updateItem(Store item) async {
+    await flyersBox.put(item.storeId, item); // Use storeId as key
+    logger.info('Store updated with ID: ${item.storeId}');
+  }
+
+  @override
+  Future<void> deleteItem(int id) async {
+    await flyersBox.delete(id);
+    logger.info('Store deleted with ID: $id');
+  }
+
+  @override
+  Future<List<Store>> getAllItems() async {
     return flyersBox.values.toList();
   }
 
   @override
-  Future<void> addFlyer(Store flyer) async {
-    await flyersBox.put(flyer.storeId, flyer);
-    logger.info('Added flyer: ${flyer.storeName}');
-  }
-
-  @override
-  Future<void> updateFlyer(Store flyer) async {
-    await flyersBox.put(flyer.storeId, flyer);
-    logger.info('Updated flyer: ${flyer.storeName}');
-  }
-
-  @override
-  Future<void> deleteFlyer(int id) async {
-    try {
-      await flyersBox.delete(id);
-      logger.info('Deleted flyer with id: $id');
-    } catch (e) {
-      logger.severe('Error deleting flyer from Hive: $e');
-      throw Exception('Error deleting flyer from Hive: $e');
+  Future<void> cacheItems(List<Store> items) async {
+    final Map<dynamic, Store> itemsMap = {};
+    for (var item in items) {
+      itemsMap[item.storeId] = item; // Use storeId as key
     }
+    await flyersBox.putAll(itemsMap);
+    logger.info('Cached ${items.length} stores.');
   }
 }
