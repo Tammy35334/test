@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,22 +28,22 @@ class MarketPageState extends State<MarketPage> {
 
   late final ProductBloc _productBloc;
 
-  //static const int _pageSize = 20;
-
   @override
   void initState() {
     super.initState();
-    final productRepository = Provider.of<ProductRepository>(context, listen: false);
+    final productRepository =
+        Provider.of<ProductRepository>(context, listen: false);
     _productBloc = ProductBloc(repository: productRepository);
+    _productBloc.add(const FetchProductsEvent());
     _loadCachedProducts();
   }
 
   Future<void> _loadCachedProducts() async {
     final cachedProducts = await _productBloc.repository.getCachedProducts();
     if (cachedProducts.isNotEmpty) {
-      _productBloc.pagingController.appendLastPage(cachedProducts);
+      _productBloc.add(const FetchProductsEvent()); // Trigger fetch to update UI
     } else {
-      _productBloc.pagingController.refresh();
+      _productBloc.add(const FetchProductsEvent());
     }
   }
 
@@ -57,14 +56,21 @@ class MarketPageState extends State<MarketPage> {
 
   // Pull-down-to-refresh handler
   Future<void> _onRefresh() async {
-    _productBloc.pagingController.refresh();
+    _productBloc.add(const FetchProductsEvent());
   }
 
   // Search function with debounce
   void _onSearchChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      _productBloc.add(SearchProductsEvent(query: value.trim()));
+      setState(() {
+        _searchQuery = value.trim();
+      });
+      if (_searchQuery.isNotEmpty) {
+        _productBloc.add(SearchProductsEvent(query: _searchQuery));
+      } else {
+        _productBloc.add(const FetchProductsEvent());
+      }
     });
   }
 
@@ -108,7 +114,8 @@ class MarketPageState extends State<MarketPage> {
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: CachedNetworkImage(
-          imageUrl: 'https://your-image-url.com/image.jpg', // Replace with your actual image URL
+          imageUrl:
+              'https://your-image-url.com/image.jpg', // Replace with your actual image URL
           placeholder: (context, url) => Container(
             width: double.infinity,
             height: 150,
@@ -133,38 +140,47 @@ class MarketPageState extends State<MarketPage> {
       child: CupertinoSearchTextField(
         controller: TextEditingController(text: _searchQuery),
         onChanged: (value) {
-          setState(() {
-            _searchQuery = value;
-          });
           _onSearchChanged(value);
         },
         onSubmitted: (value) {
-          _productBloc.add(SearchProductsEvent(query: value.trim()));
+          if (_searchQuery.isNotEmpty) {
+            _productBloc.add(SearchProductsEvent(query: _searchQuery));
+          } else {
+            _productBloc.add(const FetchProductsEvent());
+          }
         },
         onSuffixTap: () {
           setState(() {
             _searchQuery = '';
           });
-          _productBloc.add(SearchProductsEvent(query: ''));
+          _productBloc.add(const FetchProductsEvent());
         },
         placeholder: 'Search products',
       ),
     );
   }
 
-  Widget _buildProductList() {
-    return PagedListView<int, Product>(
-      pagingController: _productBloc.pagingController, // Corrected Access
-      builderDelegate: PagedChildBuilderDelegate<Product>(
-        itemBuilder: (context, item, index) => ProductListItem(product: item),
-        firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
-          error: (_productBloc.pagingController.error != null)
-              ? _productBloc.pagingController.error.toString()
-              : 'Unknown Error',
-          onTryAgain: () => _productBloc.pagingController.refresh(),
-        ),
-        noItemsFoundIndicatorBuilder: (context) => const EmptyListIndicator(),
-      ),
+  Widget _buildProductList(List<Product> products) {
+    // Apply search filter if necessary
+    List<Product> filteredProducts = _searchQuery.isNotEmpty
+        ? products
+            .where((product) => product.name
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()))
+            .toList()
+        : products;
+
+    if (filteredProducts.isEmpty) {
+      return const EmptyListIndicator();
+    }
+
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: filteredProducts.length,
+      itemBuilder: (context, index) {
+        return ProductListItem(product: filteredProducts[index]);
+      },
     );
   }
 
@@ -177,16 +193,37 @@ class MarketPageState extends State<MarketPage> {
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _onRefresh,
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildTopBar()),
-                SliverToBoxAdapter(child: const SizedBox(height: 8.0)),
-                SliverToBoxAdapter(child: _buildImageSection()),
-                SliverToBoxAdapter(child: const SizedBox(height: 16.0)),
-                SliverToBoxAdapter(child: _buildSearchBar()),
-                SliverToBoxAdapter(child: const SizedBox(height: 16.0)),
-                SliverFillRemaining(child: _buildProductList()),
-              ],
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  _buildTopBar(),
+                  const SizedBox(height: 8.0),
+                  _buildImageSection(),
+                  const SizedBox(height: 16.0),
+                  _buildSearchBar(),
+                  const SizedBox(height: 16.0),
+                  BlocBuilder<ProductBloc, ProductState>(
+                    builder: (context, state) {
+                      if (state is ProductLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (state is ProductLoaded) {
+                        return _buildProductList(state.products);
+                      } else if (state is ProductError) {
+                        return ErrorIndicator(
+                          error: state.message,
+                          onTryAgain: () =>
+                              _productBloc.add(const FetchProductsEvent()),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -209,7 +246,8 @@ class MarketPageState extends State<MarketPage> {
       context: context,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

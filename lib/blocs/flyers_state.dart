@@ -15,15 +15,21 @@ class FlyersLoading extends FlyersState {}
 
 class FlyersLoaded extends FlyersState {
   final List<Store> flyers;
-  final bool hasReachedMax;
 
-  const FlyersLoaded({required this.flyers, required this.hasReachedMax});
+  const FlyersLoaded({required this.flyers});
 
   @override
-  List<Object> get props => [flyers, hasReachedMax];
+  List<Object> get props => [flyers];
 }
 
-class FlyersDeleted extends FlyersState {}
+class FlyerDeleted extends FlyersState {
+  final int id;
+
+  const FlyerDeleted({required this.id});
+
+  @override
+  List<Object> get props => [id];
+}
 
 class FlyersError extends FlyersState {
   final String message;

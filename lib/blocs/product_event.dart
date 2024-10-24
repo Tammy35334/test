@@ -7,14 +7,10 @@ abstract class ProductEvent extends Equatable {
 }
 
 class FetchProductsEvent extends ProductEvent {
-  final int page;
-  final int limit;
-  final String? query;
-
-  const FetchProductsEvent({required this.page, required this.limit, this.query});
+  const FetchProductsEvent();
 
   @override
-  List<Object?> get props => [page, limit, query];
+  List<Object?> get props => [];
 }
 
 class SearchProductsEvent extends ProductEvent {

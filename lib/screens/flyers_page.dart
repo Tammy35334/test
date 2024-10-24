@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
@@ -30,13 +29,13 @@ class FlyersPageState extends State<FlyersPage> {
 
   late final FlyersBloc _flyersBloc;
 
- // static const int _pageSize = 20;
-
   @override
   void initState() {
     super.initState();
-    final flyersRepository = Provider.of<FlyersRepository>(context, listen: false);
+    final flyersRepository =
+        Provider.of<FlyersRepository>(context, listen: false);
     _flyersBloc = FlyersBloc(repository: flyersRepository);
+    _flyersBloc.add(const FetchFlyersEvent());
   }
 
   @override
@@ -48,7 +47,7 @@ class FlyersPageState extends State<FlyersPage> {
 
   // Pull-down-to-refresh handler
   Future<void> _onRefresh() async {
-    _flyersBloc.pagingController.refresh();
+    _flyersBloc.add(const FetchFlyersEvent());
   }
 
   // Search function with debounce
@@ -58,7 +57,7 @@ class FlyersPageState extends State<FlyersPage> {
       setState(() {
         _searchQuery = value.trim();
       });
-      _flyersBloc.pagingController.refresh();
+      _flyersBloc.add(const FetchFlyersEvent());
     });
   }
 
@@ -102,7 +101,8 @@ class FlyersPageState extends State<FlyersPage> {
           borderRadius: BorderRadius.circular(12.0),
         ),
         child: CachedNetworkImage(
-          imageUrl: 'https://your-image-url.com/image.jpg', // Replace with your actual image URL
+          imageUrl:
+              'https://your-image-url.com/image.jpg', // Replace with your actual image URL
           placeholder: (context, url) => Container(
             width: double.infinity,
             height: 150,
@@ -130,32 +130,40 @@ class FlyersPageState extends State<FlyersPage> {
           _onSearchChanged(value);
         },
         onSubmitted: (value) {
-          _flyersBloc.pagingController.refresh();
+          _flyersBloc.add(const FetchFlyersEvent());
         },
         onSuffixTap: () {
           setState(() {
             _searchQuery = '';
           });
-          _flyersBloc.pagingController.refresh();
+          _flyersBloc.add(const FetchFlyersEvent());
         },
         placeholder: 'Search flyers',
       ),
     );
   }
 
-  Widget _buildFlyerList() {
-    return PagedListView<int, Store>(
-      pagingController: _flyersBloc.pagingController,
-      builderDelegate: PagedChildBuilderDelegate<Store>(
-        itemBuilder: (context, item, index) => FlyerListItem(flyer: item),
-        firstPageErrorIndicatorBuilder: (context) => ErrorIndicator(
-          error: (_flyersBloc.pagingController.error != null)
-              ? _flyersBloc.pagingController.error.toString()
-              : 'Unknown Error',
-          onTryAgain: () => _flyersBloc.pagingController.refresh(),
-        ),
-        noItemsFoundIndicatorBuilder: (context) => const EmptyListIndicator(),
-      ),
+  Widget _buildFlyerList(List<Store> flyers) {
+    // Apply search filter if necessary
+    List<Store> filteredFlyers = _searchQuery.isNotEmpty
+        ? flyers
+            .where((flyer) => flyer.storeName
+                .toLowerCase()
+                .contains(_searchQuery.toLowerCase()))
+            .toList()
+        : flyers;
+
+    if (filteredFlyers.isEmpty) {
+      return const EmptyListIndicator();
+    }
+
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: filteredFlyers.length,
+      itemBuilder: (context, index) {
+        return FlyerListItem(flyer: filteredFlyers[index]);
+      },
     );
   }
 
@@ -168,16 +176,37 @@ class FlyersPageState extends State<FlyersPage> {
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: _onRefresh,
-            child: CustomScrollView(
-              slivers: [
-                SliverToBoxAdapter(child: _buildTopBar()),
-                SliverToBoxAdapter(child: const SizedBox(height: 8.0)),
-                SliverToBoxAdapter(child: _buildImageSection()),
-                SliverToBoxAdapter(child: const SizedBox(height: 16.0)),
-                SliverToBoxAdapter(child: _buildSearchBar()),
-                SliverToBoxAdapter(child: const SizedBox(height: 16.0)),
-                SliverFillRemaining(child: _buildFlyerList()),
-              ],
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  _buildTopBar(),
+                  const SizedBox(height: 8.0),
+                  _buildImageSection(),
+                  const SizedBox(height: 16.0),
+                  _buildSearchBar(),
+                  const SizedBox(height: 16.0),
+                  BlocBuilder<FlyersBloc, FlyersState>(
+                    builder: (context, state) {
+                      if (state is FlyersLoading) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (state is FlyersLoaded) {
+                        return _buildFlyerList(state.flyers);
+                      } else if (state is FlyersError) {
+                        return ErrorIndicator(
+                          error: state.message,
+                          onTryAgain: () =>
+                              _flyersBloc.add(const FetchFlyersEvent()),
+                        );
+                      } else {
+                        return const SizedBox.shrink();
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -200,7 +229,8 @@ class FlyersPageState extends State<FlyersPage> {
       context: context,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
+          padding:
+              const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [

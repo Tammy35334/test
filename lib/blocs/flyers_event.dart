@@ -10,13 +10,7 @@ abstract class FlyersEvent extends Equatable {
 }
 
 class FetchFlyersEvent extends FlyersEvent {
-  final int page;
-  final int limit;
-
-  const FetchFlyersEvent({required this.page, required this.limit});
-
-  @override
-  List<Object> get props => [page, limit];
+  const FetchFlyersEvent();
 }
 
 class DeleteFlyerEvent extends FlyersEvent {

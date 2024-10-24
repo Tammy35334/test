@@ -12,20 +12,10 @@ class ProductRepository {
 
   ProductRepository({required this.httpClient, required this.storage});
 
-  // Fetch products from the API with pagination
-  Future<List<Product>> fetchProducts({
-    required int page,
-    required int limit,
-    String? query,
-  }) async {
+  // Fetch products from the API
+  Future<List<Product>> fetchProducts() async {
     // Update the API endpoint as needed
-    String baseUrl = 'https://tammy35334.github.io/test/products.json';
-    String url = '$baseUrl?page=$page&limit=$limit';
-
-    if (query != null && query.isNotEmpty) {
-      // If your API supports search queries, append them here
-      url += '&search=${Uri.encodeQueryComponent(query)}';
-    }
+    String url = 'https://tammy35334.github.io/test/products.json';
 
     final response = await httpClient.get(Uri.parse(url));
 
@@ -51,9 +41,7 @@ class ProductRepository {
     logger.info('Parsed ${products.length} products from JSON.');
 
     // Cache the fetched products
-    for (var product in products) {
-      await storage.addItem(product);
-    }
+    await storage.cacheItems(products);
 
     logger.info('Cached ${products.length} products.');
 
@@ -67,6 +55,17 @@ class ProductRepository {
     return cachedProducts;
   }
 
+  // Search products in cached data
+  Future<List<Product>> searchProducts({required String query}) async {
+    final allProducts = await getCachedProducts();
+    final filteredProducts = allProducts
+        .where((product) =>
+            product.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    logger.info('Found ${filteredProducts.length} products matching "$query".');
+    return filteredProducts;
+  }
+
   Future<void> addProduct(Product product) async {
     await storage.addItem(product);
     logger.info('Product added: ${product.name}');
@@ -77,7 +76,7 @@ class ProductRepository {
     logger.info('Product updated: ${product.name}');
   }
 
-  Future<void> deleteProduct(String id) async {
+  Future<void> deleteProduct(int id) async {
     await storage.deleteItem(id);
     logger.info('Product deleted with id: $id');
   }

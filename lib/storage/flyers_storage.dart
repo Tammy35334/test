@@ -12,7 +12,7 @@ class FlyersStorage implements FlyersStorageInterface {
 
   @override
   Future<void> cacheFlyers(List<Store> flyers) async {
-    final Map<int, Store> flyersMap = { for (var f in flyers) f.storeId : f };
+    final Map<int, Store> flyersMap = {for (var f in flyers) f.storeId: f};
     await flyersBox.putAll(flyersMap);
     logger.info('Cached ${flyers.length} flyers.');
   }

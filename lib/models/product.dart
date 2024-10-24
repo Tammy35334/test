@@ -7,7 +7,7 @@ part 'product.g.dart';
 @HiveType(typeId: 0)
 class Product extends HiveObject {
   @HiveField(0)
-  final int id; // Changed from String to int
+  final int id; // ID as int
 
   @HiveField(1)
   final String name;
@@ -31,7 +31,7 @@ class Product extends HiveObject {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     return Product(
-      id: json['id'] as int,
+      id: json['id'] as int, // Ensure ID is an int
       name: json['name'] as String,
       description: json['description'] as String,
       price: (json['price'] as num).toDouble(),

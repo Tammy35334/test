@@ -1,22 +1,23 @@
 // lib/screens/flyer_detail_page.dart
 
-import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
+import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui' as ui; // Alias to avoid naming conflicts
 
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'package:flutter/rendering.dart'; // For RepaintBoundary
-import 'dart:ui'; // For ImageByteFormat
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../models/drawn_line.dart';
-import '../utils/logger.dart'; // Logger for logging
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+
 import '../blocs/drawing_bloc.dart';
 import '../blocs/drawing_event.dart';
 import '../blocs/drawing_state.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'dart:async';
+import '../models/drawn_line.dart';
+import '../utils/logger.dart';
+import 'package:flutter/rendering.dart'; // Import RenderRepaintBoundary
 
 /// Represents a single line drawn by the user.
 class DrawnLineData {
@@ -96,7 +97,9 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
   /// Loads existing drawings from the DrawingBloc for the initial page.
   void _loadDrawings() {
     if (widget.flyerImages.isNotEmpty) {
-      context.read<DrawingBloc>().add(LoadDrawingsEvent(imageId: _getImageKey(_currentPage)));
+      context
+          .read<DrawingBloc>()
+          .add(LoadDrawingsEvent(imageId: _getImageKey(_currentPage)));
     }
   }
 
@@ -109,7 +112,9 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
   List<Offset> _deserializePoints(List<double> points) {
     List<Offset> offsets = [];
     for (int i = 0; i < points.length; i += 2) {
-      offsets.add(Offset(points[i], points[i + 1]));
+      if (i + 1 < points.length) {
+        offsets.add(Offset(points[i], points[i + 1]));
+      }
     }
     return offsets;
   }
@@ -117,21 +122,24 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
   /// Shares the current image along with the drawings.
   Future<void> _shareImageWithDrawings() async {
     try {
-      logger.info('Sharing image with drawings for image index $_currentPage.');
+      logger.info(
+          'Sharing image with drawings for image index $_currentPage.');
 
       // Capture the image with drawings
-      RenderRepaintBoundary? boundary =
-          _repaintKeys[_currentPage].currentContext?.findRenderObject() as RenderRepaintBoundary?;
+      RenderRepaintBoundary? boundary = _repaintKeys[_currentPage]
+          .currentContext
+          ?.findRenderObject() as RenderRepaintBoundary?;
       if (boundary == null) {
         throw Exception("Unable to find render object");
       }
 
-      final image = await boundary.toImage(pixelRatio: 3.0);
-      final byteData = await image.toByteData(format: ImageByteFormat.png);
+      final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+      final ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData == null) {
         throw Exception("Failed to capture image with drawings");
       }
-      final imageBytes = byteData.buffer.asUint8List();
+      final Uint8List imageBytes = byteData.buffer.asUint8List();
 
       // Check if imageBytes is empty
       if (imageBytes.isEmpty) {
@@ -160,7 +168,8 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
         subject: 'Flyer from ${widget.storeName}',
       );
 
-      logger.info('Image shared successfully for image index $_currentPage.');
+      logger.info(
+          'Image shared successfully for image index $_currentPage.');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Flyer shared successfully!')),
@@ -188,7 +197,9 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
     setState(() {
       _currentPage = index;
     });
-    context.read<DrawingBloc>().add(LoadDrawingsEvent(imageId: _getImageKey(index)));
+    context
+        .read<DrawingBloc>()
+        .add(LoadDrawingsEvent(imageId: _getImageKey(index)));
   }
 
   @override
@@ -253,8 +264,12 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
                               child: CachedNetworkImage(
                                 imageUrl: widget.flyerImages[index],
                                 fit: BoxFit.contain,
-                                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                                errorWidget: (context, url, error) => const Center(child: Icon(Icons.broken_image, size: 50)),
+                                placeholder: (context, url) => const Center(
+                                    child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    const Center(
+                                        child: Icon(Icons.broken_image,
+                                            size: 50)),
                               ),
                             ),
                             CustomPaint(
@@ -276,7 +291,9 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
 
   /// Handles the start of a drawing gesture.
   void _onPanStart(DragStartDetails details, int index) {
-    RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
+    RenderBox? renderBox = _repaintKeys[index]
+        .currentContext
+        ?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       Offset localPosition = renderBox.globalToLocal(details.globalPosition);
       _tempPoints = [localPosition.dx, localPosition.dy];
@@ -288,7 +305,9 @@ class _FlyerDetailPageState extends State<FlyerDetailPage> {
     if (_debounceTimer?.isActive ?? false) return;
     _debounceTimer = Timer(Duration(milliseconds: _debounceDuration), () {});
 
-    RenderBox? renderBox = _repaintKeys[index].currentContext?.findRenderObject() as RenderBox?;
+    RenderBox? renderBox = _repaintKeys[index]
+        .currentContext
+        ?.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       Offset localPosition = renderBox.globalToLocal(details.globalPosition);
       setState(() {

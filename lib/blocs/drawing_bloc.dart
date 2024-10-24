@@ -16,28 +16,41 @@ class DrawingBloc extends Bloc<DrawingEvent, DrawingState> {
     on<ClearDrawingsEvent>(_onClearDrawings);
   }
 
-  Future<void> _onLoadDrawings(LoadDrawingsEvent event, Emitter<DrawingState> emit) async {
+  Future<void> _onLoadDrawings(
+      LoadDrawingsEvent event, Emitter<DrawingState> emit) async {
     try {
       final drawings = await drawingStorage.getDrawings(event.imageId);
       emit(DrawingLoaded(drawings: drawings));
-      logger.info('Loaded ${drawings.length} drawings for imageId: ${event.imageId}');
+      logger.info(
+          'Loaded ${drawings.length} drawings for imageId: ${event.imageId}');
     } catch (e) {
       emit(DrawingError(message: e.toString()));
       logger.severe('Error loading drawings: $e');
     }
   }
 
-  Future<void> _onAddDrawing(AddDrawingEvent event, Emitter<DrawingState> emit) async {
+  Future<void> _onAddDrawing(
+      AddDrawingEvent event, Emitter<DrawingState> emit) async {
     if (state is DrawingLoaded) {
-      final currentDrawings = List<DrawnLine>.from((state as DrawingLoaded).drawings);
-      currentDrawings.add(event.drawnLine);
-      await drawingStorage.saveDrawings(event.imageId, currentDrawings);
-      emit(DrawingLoaded(drawings: currentDrawings));
-      logger.info('Added a drawing for imageId: ${event.imageId}');
+      try {
+        final currentDrawings =
+            List<DrawnLine>.from((state as DrawingLoaded).drawings);
+        currentDrawings.add(event.drawnLine);
+        await drawingStorage.saveDrawings(event.imageId, currentDrawings);
+        emit(DrawingLoaded(drawings: currentDrawings));
+        logger.info('Added a drawing for imageId: ${event.imageId}');
+      } catch (e) {
+        emit(DrawingError(message: e.toString()));
+        logger.severe('Error adding drawing: $e');
+      }
+    } else {
+      emit(DrawingError(
+          message: 'Cannot add drawing when state is not DrawingLoaded'));
     }
   }
 
-  Future<void> _onClearDrawings(ClearDrawingsEvent event, Emitter<DrawingState> emit) async {
+  Future<void> _onClearDrawings(
+      ClearDrawingsEvent event, Emitter<DrawingState> emit) async {
     try {
       await drawingStorage.clearDrawings(event.imageId);
       emit(const DrawingLoaded(drawings: []));

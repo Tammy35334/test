@@ -20,7 +20,7 @@ class FlyersRepository {
   });
 
   /// Fetches flyers with a data freshness check.
-  Future<List<Store>> fetchFlyers({required int page, required int limit}) async {
+  Future<List<Store>> fetchFlyers() async {
     final String metadataKey = 'flyers_last_fetch';
     final Metadata? metadata = metadataBox.get(metadataKey);
 
@@ -30,9 +30,10 @@ class FlyersRepository {
     if (shouldFetch) {
       logger.info('Fetching fresh flyers data from server.');
       try {
-        final fetchedFlyers = await _fetchFlyersFromServer(page: page, limit: limit);
+        final fetchedFlyers = await _fetchFlyersFromServer();
         await storage.cacheFlyers(fetchedFlyers);
-        metadataBox.put(metadataKey, Metadata(key: metadataKey, timestamp: DateTime.now()));
+        metadataBox.put(
+            metadataKey, Metadata(key: metadataKey, timestamp: DateTime.now()));
         return fetchedFlyers;
       } catch (e) {
         logger.severe('Error fetching flyers: $e');
@@ -50,8 +51,9 @@ class FlyersRepository {
   }
 
   /// Actual server fetching logic.
-  Future<List<Store>> _fetchFlyersFromServer({required int page, required int limit}) async {
-    final url = Uri.parse('https://tammy35334.github.io/test/flyers.json?page=$page&limit=$limit');
+  Future<List<Store>> _fetchFlyersFromServer() async {
+    final url = Uri.parse(
+        'https://tammy35334.github.io/test/flyers.json'); // Removed pagination params
     final response = await httpClient.get(url);
 
     if (response.statusCode != 200) {
@@ -65,7 +67,9 @@ class FlyersRepository {
     if (data is List) {
       stores = data.map((json) => Store.fromJson(json)).toList();
     } else if (data is Map<String, dynamic> && data.containsKey('stores')) {
-      stores = (data['stores'] as List).map((json) => Store.fromJson(json)).toList();
+      stores = (data['stores'] as List)
+          .map((json) => Store.fromJson(json))
+          .toList();
     } else {
       logger.severe('Invalid JSON format');
       throw Exception('Invalid JSON format');
