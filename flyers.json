@@ -1,0 +1,222 @@
+[
+  {
+    "storeId": 1,
+    "storeName": "Loblaws",
+    "province": "National",
+    "flyerImages": [
+      "https://flyers.smartcanucks.ca/uploads/pages/253548/no-frills-on-flyer-october-17-to-233-2.jpg",
+      "https://flyers.smartcanucks.ca/uploads/pages/253548/no-frills-on-flyer-october-17-to-233-2.jpg",
+      "https://flyers.smartcanucks.ca/uploads/pages/253548/no-frills-on-flyer-october-17-to-233-2.jpg"
+    ]
+  },
+  {
+    "storeId": 2,
+    "storeName": "Real Canadian Superstore",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 3,
+    "storeName": "No Frills",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 4,
+    "storeName": "Sobeys",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 5,
+    "storeName": "Safeway",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 6,
+    "storeName": "Metro",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 7,
+    "storeName": "IGA",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 8,
+    "storeName": "Food Basics",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 9,
+    "storeName": "FreshCo",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 10,
+    "storeName": "Walmart Canada",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 11,
+    "storeName": "Save-On-Foods",
+    "province": "BC",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 12,
+    "storeName": "Real Canadian Superstore",
+    "province": "BC",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 13,
+    "storeName": "Whole Foods Market",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 14,
+    "storeName": "Costco Canada",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 15,
+    "storeName": "Giant Tiger",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 16,
+    "storeName": "Home Hardware",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 17,
+    "storeName": "Rona",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 18,
+    "storeName": "Lowe's Canada",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 19,
+    "storeName": "Canadian Tire",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 20,
+    "storeName": "PetSmart Canada",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 21,
+    "storeName": "Ren's Pet Depot",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  },
+  {
+    "storeId": 22,
+    "storeName": "Bulk Barn",
+    "province": "National",
+    "flyerImages": [
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png",
+      "https://placehold.co/400x900.png"
+    ]
+  }
+]

@@ -1,0 +1,352 @@
+[
+  {
+    "id": 1,
+    "name": "Organic Apples",
+    "description": "Fresh organic apples sourced from local orchards.",
+    "price": 3.99,
+    "imageUrl": "https://images.stockcake.com/public/b/b/1/bb116b91-e48a-4455-91de-55d2816668c0_medium/fresh-red-apple-stockcake.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Bananas",
+    "description": "Sweet and ripe bananas, perfect for snacks and smoothies.",
+    "price": 1.29,
+    "imageUrl": "https://via.placeholder.com/150?text=Bananas"
+  },
+  {
+    "id": 3,
+    "name": "Whole Wheat Bread",
+    "description": "Healthy whole wheat bread baked fresh daily.",
+    "price": 2.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Whole+Wheat+Bread"
+  },
+  {
+    "id": 4,
+    "name": "Free-Range Eggs",
+    "description": "Organic free-range eggs rich in protein.",
+    "price": 4.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Free-Range+Eggs"
+  },
+  {
+    "id": 5,
+    "name": "Almond Milk",
+    "description": "Dairy-free almond milk, unsweetened.",
+    "price": 3.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Almond+Milk"
+  },
+  {
+    "id": 6,
+    "name": "Greek Yogurt",
+    "description": "Creamy Greek yogurt high in probiotics.",
+    "price": 1.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Greek+Yogurt"
+  },
+  {
+    "id": 7,
+    "name": "Organic Spinach",
+    "description": "Fresh organic spinach leaves packed with nutrients.",
+    "price": 2.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Organic+Spinach"
+  },
+  {
+    "id": 8,
+    "name": "Carrots",
+    "description": "Crunchy carrots perfect for salads and cooking.",
+    "price": 1.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Carrots"
+  },
+  {
+    "id": 9,
+    "name": "Broccoli",
+    "description": "Fresh green broccoli rich in vitamins.",
+    "price": 2.59,
+    "imageUrl": "https://via.placeholder.com/150?text=Broccoli"
+  },
+  {
+    "id": 10,
+    "name": "Salmon Fillets",
+    "description": "Premium wild-caught salmon fillets.",
+    "price": 12.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Salmon+Fillets"
+  },
+  {
+    "id": 11,
+    "name": "Chicken Breasts",
+    "description": "Lean and tender chicken breasts, skinless.",
+    "price": 8.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Chicken+Breasts"
+  },
+  {
+    "id": 12,
+    "name": "Tofu",
+    "description": "Firm tofu ideal for stir-fries and marinades.",
+    "price": 2.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Tofu"
+  },
+  {
+    "id": 13,
+    "name": "Quinoa",
+    "description": "Nutritious quinoa, a great source of protein.",
+    "price": 4.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Quinoa"
+  },
+  {
+    "id": 14,
+    "name": "Brown Rice",
+    "description": "Whole grain brown rice, perfect as a side dish.",
+    "price": 3.29,
+    "imageUrl": "https://via.placeholder.com/150?text=Brown+Rice"
+  },
+  {
+    "id": 15,
+    "name": "Black Beans",
+    "description": "Canned black beans ready to use in various recipes.",
+    "price": 1.19,
+    "imageUrl": "https://via.placeholder.com/150?text=Black+Beans"
+  },
+  {
+    "id": 16,
+    "name": "Lentils",
+    "description": "Red lentils cooked to perfection for soups and stews.",
+    "price": 1.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Lentils"
+  },
+  {
+    "id": 17,
+    "name": "Cherry Tomatoes",
+    "description": "Sweet cherry tomatoes ideal for salads and snacking.",
+    "price": 3.59,
+    "imageUrl": "https://via.placeholder.com/150?text=Cherry+Tomatoes"
+  },
+  {
+    "id": 18,
+    "name": "Avocados",
+    "description": "Creamy avocados perfect for guacamole and spreads.",
+    "price": 1.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Avocados"
+  },
+  {
+    "id": 19,
+    "name": "Cucumbers",
+    "description": "Fresh cucumbers, great for hydrating salads.",
+    "price": 0.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Cucumbers"
+  },
+  {
+    "id": 20,
+    "name": "Bell Peppers",
+    "description": "Colorful bell peppers, sweet and crunchy.",
+    "price": 2.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Bell+Peppers"
+  },
+  {
+    "id": 21,
+    "name": "Sweet Potatoes",
+    "description": "Organic sweet potatoes rich in fiber.",
+    "price": 1.79,
+    "imageUrl": "https://via.placeholder.com/150?text=Sweet+Potatoes"
+  },
+  {
+    "id": 22,
+    "name": "Onions",
+    "description": "Yellow onions essential for various dishes.",
+    "price": 0.89,
+    "imageUrl": "https://via.placeholder.com/150?text=Onions"
+  },
+  {
+    "id": 23,
+    "name": "Garlic",
+    "description": "Fresh garlic cloves to enhance flavor.",
+    "price": 0.50,
+    "imageUrl": "https://via.placeholder.com/150?text=Garlic"
+  },
+  {
+    "id": 24,
+    "name": "Ginger",
+    "description": "Fresh ginger root for cooking and teas.",
+    "price": 1.25,
+    "imageUrl": "https://via.placeholder.com/150?text=Ginger"
+  },
+  {
+    "id": 25,
+    "name": "Cilantro",
+    "description": "Fresh cilantro leaves to garnish your meals.",
+    "price": 0.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Cilantro"
+  },
+  {
+    "id": 26,
+    "name": "Parsley",
+    "description": "Fresh parsley for added flavor and color.",
+    "price": 0.89,
+    "imageUrl": "https://via.placeholder.com/150?text=Parsley"
+  },
+  {
+    "id": 27,
+    "name": "Basil",
+    "description": "Aromatic basil leaves perfect for Italian dishes.",
+    "price": 1.29,
+    "imageUrl": "https://via.placeholder.com/150?text=Basil"
+  },
+  {
+    "id": 28,
+    "name": "Oregano",
+    "description": "Dried oregano leaves to spice up your meals.",
+    "price": 0.75,
+    "imageUrl": "https://via.placeholder.com/150?text=Oregano"
+  },
+  {
+    "id": 29,
+    "name": "Thyme",
+    "description": "Fragrant thyme for seasoning and marinades.",
+    "price": 0.85,
+    "imageUrl": "https://via.placeholder.com/150?text=Thyme"
+  },
+  {
+    "id": 30,
+    "name": "Rosemary",
+    "description": "Dried rosemary to add a robust flavor.",
+    "price": 0.95,
+    "imageUrl": "https://via.placeholder.com/150?text=Rosemary"
+  },
+  {
+    "id": 31,
+    "name": "Black Pepper",
+    "description": "Freshly ground black pepper for seasoning.",
+    "price": 2.19,
+    "imageUrl": "https://via.placeholder.com/150?text=Black+Pepper"
+  },
+  {
+    "id": 32,
+    "name": "Sea Salt",
+    "description": "Natural sea salt to enhance the taste of your dishes.",
+    "price": 1.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Sea+Salt"
+  },
+  {
+    "id": 33,
+    "name": "Olive Oil",
+    "description": "Extra virgin olive oil for cooking and dressing.",
+    "price": 6.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Olive+Oil"
+  },
+  {
+    "id": 34,
+    "name": "Canola Oil",
+    "description": "Light canola oil ideal for frying and baking.",
+    "price": 3.59,
+    "imageUrl": "https://via.placeholder.com/150?text=Canola+Oil"
+  },
+  {
+    "id": 35,
+    "name": "Vinegar",
+    "description": "White vinegar for cleaning and cooking purposes.",
+    "price": 1.29,
+    "imageUrl": "https://via.placeholder.com/150?text=Vinegar"
+  },
+  {
+    "id": 36,
+    "name": "Honey",
+    "description": "Natural honey sweetener from organic sources.",
+    "price": 4.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Honey"
+  },
+  {
+    "id": 37,
+    "name": "Maple Syrup",
+    "description": "Pure maple syrup perfect for pancakes and waffles.",
+    "price": 5.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Maple+Syrup"
+  },
+  {
+    "id": 38,
+    "name": "Peanut Butter",
+    "description": "Creamy peanut butter rich in protein.",
+    "price": 2.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Peanut+Butter"
+  },
+  {
+    "id": 39,
+    "name": "Jelly",
+    "description": "Sweet strawberry jelly for your favorite sandwiches.",
+    "price": 1.89,
+    "imageUrl": "https://via.placeholder.com/150?text=Jelly"
+  },
+  {
+    "id": 40,
+    "name": "Granola",
+    "description": "Crunchy granola parfait for a healthy breakfast.",
+    "price": 3.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Granola"
+  },
+  {
+    "id": 41,
+    "name": "Cereal",
+    "description": "Whole grain cereal to start your day right.",
+    "price": 2.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Cereal"
+  },
+  {
+    "id": 42,
+    "name": "Milk",
+    "description": "Fresh whole milk rich in calcium.",
+    "price": 2.59,
+    "imageUrl": "https://via.placeholder.com/150?text=Milk"
+  },
+  {
+    "id": 43,
+    "name": "Cheddar Cheese",
+    "description": "Aged cheddar cheese with a sharp flavor.",
+    "price": 4.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Cheddar+Cheese"
+  },
+  {
+    "id": 44,
+    "name": "Mozzarella Cheese",
+    "description": "Fresh mozzarella cheese perfect for pizzas.",
+    "price": 3.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Mozzarella+Cheese"
+  },
+  {
+    "id": 45,
+    "name": "Butter",
+    "description": "Creamy butter for cooking and baking.",
+    "price": 2.79,
+    "imageUrl": "https://via.placeholder.com/150?text=Butter"
+  },
+  {
+    "id": 46,
+    "name": "Cream Cheese",
+    "description": "Smooth cream cheese ideal for bagels and desserts.",
+    "price": 2.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Cream+Cheese"
+  },
+  {
+    "id": 47,
+    "name": "Sour Cream",
+    "description": "Tangy sour cream to top your favorite dishes.",
+    "price": 1.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Sour+Cream"
+  },
+  {
+    "id": 48,
+    "name": "Yogurt",
+    "description": "Plain yogurt rich in probiotics.",
+    "price": 1.49,
+    "imageUrl": "https://via.placeholder.com/150?text=Yogurt"
+  },
+  {
+    "id": 49,
+    "name": "Iceberg Lettuce",
+    "description": "Crisp iceberg lettuce for fresh salads.",
+    "price": 1.29,
+    "imageUrl": "https://via.placeholder.com/150?text=Iceberg+Lettuce"
+  },
+  {
+    "id": 50,
+    "name": "Red Cabbage",
+    "description": "Vibrant red cabbage rich in antioxidants.",
+    "price": 1.99,
+    "imageUrl": "https://via.placeholder.com/150?text=Red+Cabbage"
+  }
+]
