@@ -3,26 +3,38 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/flyer.dart';
 import 'models/flyer_image_data.dart';
+import 'models/emoji_reaction.dart';
 import 'repositories/flyer_repository.dart';
 import 'navigation/screens/main_navigation.dart';
 import 'repositories/product_repository.dart';
 import 'navigation/cubit/navigation_cubit.dart';
-import 'models/drawing.dart';
+import 'services/emoji_reaction_manager.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
 
+  // Register Hive Adapters
   Hive.registerAdapter(FlyerAdapter());
   Hive.registerAdapter(FlyerImageDataAdapter());
-  Hive.registerAdapter(DrawingAdapter());
-  Hive.registerAdapter(DrawingPointAdapter());
+  Hive.registerAdapter(EmojiTypeAdapter());
+  Hive.registerAdapter(EmojiReactionAdapter());
   
+  // Initialize repositories and services
   final flyerRepository = FlyerRepository();
+  final emojiReactionManager = EmojiReactionManager();
+  await emojiReactionManager.init();
   
   runApp(
-    BlocProvider(
-      create: (context) => flyerRepository,
+    MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider(
+          create: (context) => flyerRepository,
+        ),
+        RepositoryProvider(
+          create: (context) => emojiReactionManager,
+        ),
+      ],
       child: const MyApp(),
     ),
   );

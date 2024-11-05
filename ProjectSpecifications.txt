@@ -1,0 +1,224 @@
+# Grocery Price Comparison App Technical Specification
+
+# about the app
+I will give you an app idea, I figured out a few blocks. give me a detailed specification of how the front end, backend architecture should function in order to achieve the goals.
+
+The performance of the app is the top priority
+Cost of operation, that is, databases, bandwidth, server cost have to at a minimum.
+Extremely simple and Scalability
+highest UX
+ Best Flutter / dart practices for mobile and web.
+
+The app is built using Flutter framework, all the necessary data , 99% of all the app data changes on a weekly basis hence all the content like like the flyer images, storelist, item prices etc, are obtained using a json file which is obtained from cloudflare, since its the cheapest option I was able to find. The app uses extensive caching to prevent unnecessary api calls and keep operational costs low. Hive is used for this purpose, the app runs on mobile as well as the web. The app uses BLOC architecture
+
+
+The concept of the app is to provide weekly grocery store item prices and store flyers, with critical features like, marking fav items on store flyers and saving them to a list and writing a shopping list.
+
+The following 3 main screen will achieve most of the app’s functionality
+Market - this page will have the curated list of product prices, when a product items is clicked a new page will display its price across the store where its available, all this data is obtained by Json file.
+
+The UI is simple.
+A top row, on one side is a postal code the other side is a profile settings icon.
+Below that is a image fo 250px height, mostly to show promotional stuff, below  that is a search bar, for now, the search is non-functional, later we will add functionality to this. Below that is the important list of grocery items for that week. They might range from 20 to 50 items usually. When a item is clicked it will open a new page to that prices across stores, for example, when the user clicks on a apple, the new page will open to reveal prices of apples across stores.
+
+
+
+Flyers - this pages looks exactly like the MArkets page, the idea is to show a list of grocery stores, when clicked will open the store flyer, which is usually a series of 10 flyer images that people can scroll and mark their fav items by drawing a circle.
+
+
+
+Shopping List - people can write down a shop list of their own, this is exactly like google keep.
+
+
+
+All the markings on the flyers are aggregated and categorised by store using a universal FLoating action button and bottom drawer.I am expecting an answer like , what should be initialized just when people open the app, what should the app render, how should the UI look, the underlying operations to achieve the goals
+
+
+
+## 1. Architecture Overview
+
+### 1.1 Technology Stack
+- Frontend: Flutter/Dart (Web + Mobile)
+- State Management: BLoC Pattern
+- Local Storage: Hive
+- CDN: Cloudflare
+- Analytics: Firebase Analytics
+- Error Tracking: Firebase Crashlytics
+
+### 1.2 Data Flow Architecture
+```
+[Cloudflare CDN] --> [Weekly JSON Data]
+         ↓
+[Flutter App] ←→ [Hive Cache]
+         ↓
+[BLoC Layer] --> [UI Layer]
+         ↓
+[Firebase Analytics/Crashlytics]
+```
+
+## 2. Data Management
+
+### 2.1 Cache Strategy
+- **Initial Load**:
+  - Load cached data from Hive immediately
+  - Check JSON timestamp from Cloudflare
+  - Update cache if newer version available
+  - Cache lifetime: 7 days (matching weekly updates)
+### 2.2 Data Structure
+```dart
+// Main JSON Structure
+{
+  "version": "2024-10-23",
+  "postal_codes": ["..."],
+  "products": [{
+    "id": "string",
+    "name": "string",
+    "category": "string",
+    "image_url": "string",
+    "prices": [{
+      "store_id": "string",
+      "price": double,
+      "unit": "string",
+      "valid_until": "date"
+    }]
+  }],
+  "stores": [{
+    "id": "string",
+    "name": "string",
+    "logo_url": "string",
+    "flyers": [{
+      "id": "string",
+      "pages": ["url1", "url2", ...]
+    }]
+  }]
+}
+```
+
+## 3. Screen Specifications
+
+### 3.1 Market Screen
+- **Initialization**:
+  1. Load postal code from cache
+  2. Load promotional banner from cache
+  3. Load featured products list from cache
+  4. Check for data updates in background
+
+- **UI Components**:
+  ```
+  ┌──────────────────────────┐
+  │ [Postal Code]  [Profile] │
+  ├──────────────────────────┤
+  │                          │
+  │    Promotional Banner    │
+  │      (250px height)      │
+  │                          │
+  ├──────────────────────────┤
+  │ 🔍 Search                │
+  ├──────────────────────────┤
+  │ • Product Item 1         │
+  │ • Product Item 2         │
+  │ • Product Item 3         │
+  └──────────────────────────┘
+  ```
+
+### 3.2 Flyers Screen
+- **Initialization**:
+  1. Load store list from cache
+  2. Lazy load flyer images on demand
+  3. Cache viewed flyers locally
+
+- **UI Components**:
+  - Store list with same layout as Market screen
+  - Flyer viewer with drawing capability
+  - Save drawings as vector paths for efficiency
+
+### 3.3 Shopping List Screen
+- **Local Storage Structure**:
+  ```dart
+  ShoppingList {
+    String id;
+    String title;
+    List<ShoppingItem> items;
+    DateTime created;
+    DateTime modified;
+  }
+  ```
+
+## 4. Performance Optimizations
+
+### 4.1 Image Handling
+- Use progressive JPEGs for flyers
+- Implement lazy loading for images
+- Cache flyer images locally after first view
+- Implement image preloading for adjacent pages
+
+### 4.2 State Management
+```dart
+// BLoC Structure
+abstract class AppEvent {}
+abstract class AppState {}
+
+class AppBloc extends Bloc<AppEvent, AppState> {
+  final Repository repository;
+  final CacheManager cacheManager;
+  
+  // Handle data loading
+  // Handle cache updates
+  // Handle user interactions
+}
+```
+
+### 4.3 Cache Strategy
+- **Priority Levels**:
+  1. Critical Data (postal code, user preferences)
+  2. Current Week Data (prices, store info)
+  3. Flyer Images (on-demand)
+  4. Historical Data (previous weeks)
+
+## 5. Implementation Guidelines
+
+### 5.1 Startup Sequence
+1. Show splash screen
+2. Initialize Hive
+3. Load cached data
+4. Initialize BLoCs
+5. Check for updates
+6. Navigate to home screen
+
+### 5.2 Error Handling
+- Implement retry mechanism for failed loads
+- Cache error states to prevent repeated failures
+- Show appropriate user feedback
+- Log errors to Firebase Crashlytics
+
+### 5.3 Code Organization
+```
+lib/
+├── blocs/
+├── models/
+├── repositories/
+├── screens/
+├── services/
+├── utils/
+└── widgets/
+```
+
+### 5.4 Testing Strategy
+- Unit tests for business logic
+- Widget tests for UI components
+- Integration tests for critical flows
+- Performance tests for data loading
+
+## 6. Monitoring and Analytics
+
+### 6.1 Key Metrics
+- Screen load times
+- Cache hit rates
+- User engagement metrics
+- Error rates
+
+### 6.2 Analytics Events
+- Screen views
+- Search queries
+- Flyer interactions
+- Shopping list actions

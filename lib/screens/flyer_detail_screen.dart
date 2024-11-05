@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import '../models/flyer.dart';
 import '../repositories/flyer_repository.dart';
 import '../widgets/optimized_flyer_image.dart';
-import '../models/drawing.dart';
-import '../services/drawing_manager.dart';
-import '../widgets/drawing_painter.dart';
-
+import '../models/emoji_reaction.dart';
+import '../services/emoji_reaction_manager.dart';
+import '../widgets/emoji_reaction_overlay.dart';
+import '../widgets/emoji_reactions_bottom_sheet.dart';
 
 class FlyerDetailScreen extends StatefulWidget {
   final Flyer flyer;
@@ -27,9 +27,8 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
   int _currentIndex = 0;
   bool _isZoomed = false;
   bool _isLoading = true;
-  final DrawingManager _drawingManager = DrawingManager();
-  List<List<Offset>> _currentStrokes = [];
-  bool _isDrawingMode = false;
+  Offset? _longPressPosition;
+  late final EmojiReactionManager _emojiManager;
   
   @override
   void initState() {
@@ -38,8 +37,7 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
     _transformationController.addListener(_onTransformChanged);
     _imageBytesList = List.filled(widget.flyer.flyerImages.length, null);
     _loadImages();
-    _drawingManager.init();
-    _loadDrawings();
+    _emojiManager = context.read<EmojiReactionManager>();
   }
 
   @override
@@ -57,26 +55,10 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
     
     if (mounted) {
       setState(() {
-        _imageBytesList = loadedImages;
+        _imageBytesList = List<Uint8List?>.from(loadedImages);
         _isLoading = false;
       });
     }
-  }
-
-  Future<void> _loadDrawings() async {
-    final drawings = _drawingManager.getDrawingsForPage(
-      widget.flyer.storeId,
-      _currentIndex,
-    );
-    
-   setState(() {
-  _currentStrokes = drawings
-      .map((drawing) => drawing.points
-          .map((point) => point.toOffset())
-          .toList())
-      .toList();
-});
-
   }
 
   void _onTransformChanged() {
@@ -96,55 +78,55 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
     if (index != _currentIndex) {
       setState(() {
         _currentIndex = index;
-        // Reset zoom when changing images
         _transformationController.value = Matrix4.identity();
       });
     }
   }
 
-  void _onPanStart(DragStartDetails details) {
-    if (!_isDrawingMode) return;
-    
+  void _onLongPressStart(LongPressStartDetails details) {
     final box = context.findRenderObject() as RenderBox;
-    final point = box.globalToLocal(details.globalPosition);
+    final position = box.globalToLocal(details.globalPosition);
     
     setState(() {
-      _currentStrokes.add([point]);
+      _longPressPosition = position;
     });
   }
 
-  void _onPanUpdate(DragUpdateDetails details) {
-    if (!_isDrawingMode || _currentStrokes.isEmpty) return;
-    
+  void _onEmojiSelected(EmojiType type) {
+    if (_longPressPosition == null) return;
+
     final box = context.findRenderObject() as RenderBox;
-    final point = box.globalToLocal(details.globalPosition);
-    
+    final size = box.size;
+
+    final reaction = EmojiReaction.fromPixelPosition(
+      storeId: widget.flyer.storeId.toString(), // Convert to String
+      pageNumber: _currentIndex,
+      position: _longPressPosition!,
+      pageSize: size,
+      emojiType: type,
+    );
+
+    _emojiManager.saveReaction(reaction);
+
     setState(() {
-      _currentStrokes.last.add(point);
+      _longPressPosition = null;
     });
   }
 
-  void _onPanEnd(DragEndDetails details) {
-    if (!_isDrawingMode || _currentStrokes.isEmpty) return;
+  void _showReactionsBottomSheet() {
+    final reactions = _emojiManager.getReactionsByType(widget.flyer.storeId.toString()); // Convert to String
     
-    final stroke = _currentStrokes.last;
-    if (stroke.isEmpty) return;
-
-    // Calculate center of the stroke
-    final center = stroke.reduce((a, b) => Offset(a.dx + b.dx, a.dy + b.dy));
-    final centerPoint = DrawingPoint.fromOffset(
-      Offset(center.dx / stroke.length, center.dy / stroke.length)
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => EmojiReactionsBottomSheet(
+        reactions: reactions,
+        onReactionSelected: (reaction) {
+          Navigator.pop(context);
+          _navigateToImage(reaction.pageNumber);
+          // TODO: Highlight the selected reaction
+        },
+      ),
     );
-    
-    // Save drawing
-    final drawing = Drawing(
-      storeId: widget.flyer.storeId,
-      pageIndex: _currentIndex,
-      points: stroke.map(DrawingPoint.fromOffset).toList(),
-      center: centerPoint,
-    );
-    
-    _drawingManager.saveDrawing(drawing);
   }
 
   Widget _buildMainImage() {
@@ -154,36 +136,53 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
 
     return Stack(
       children: [
-        InteractiveViewer(
-          transformationController: _transformationController,
-          minScale: 1.0,
-          maxScale: 4.0,
-          child: Stack(
-            children: [
-              OptimizedFlyerImage(
-                key: ValueKey('image_$_currentIndex'),
-                imageBytes: _imageBytesList[_currentIndex]!,
-                fit: BoxFit.contain,
-              ),
-              CustomPaint(
-                painter: DrawingPainter(
-                  strokes: _currentStrokes,
-                  color: Colors.red.withOpacity(0.7),
+        GestureDetector(
+          onLongPressStart: _onLongPressStart,
+          child: InteractiveViewer(
+            transformationController: _transformationController,
+            minScale: 1.0,
+            maxScale: 4.0,
+            child: Stack(
+              children: [
+                OptimizedFlyerImage(
+                  key: ValueKey('image_$_currentIndex'),
+                  imageBytes: _imageBytesList[_currentIndex]!,
+                  fit: BoxFit.contain,
                 ),
-              ),
-            ],
+                ..._buildEmojiOverlays(),
+              ],
+            ),
           ),
         ),
-        if (_isDrawingMode)
-          Positioned.fill(
-            child: GestureDetector(
-              onPanStart: _onPanStart,
-              onPanUpdate: _onPanUpdate,
-              onPanEnd: _onPanEnd,
-            ),
+        if (_longPressPosition != null)
+          EmojiReactionOverlay(
+            position: _longPressPosition!,
+            onEmojiSelected: _onEmojiSelected,
           ),
       ],
     );
+  }
+
+  List<Widget> _buildEmojiOverlays() {
+    final reactions = _emojiManager.getReactionsForPage(
+      widget.flyer.storeId.toString(), // Convert to String
+      _currentIndex,
+    );
+
+    return reactions.map((reaction) {
+      final position = reaction.getPixelPosition(
+        MediaQuery.of(context).size,
+      );
+
+      return Positioned(
+        left: position.dx - 12,
+        top: position.dy - 12,
+        child: Text(
+          reaction.emojiChar,
+          style: const TextStyle(fontSize: 24),
+        ),
+      );
+    }).toList();
   }
 
   Widget _buildThumbnail(int index) {
@@ -239,7 +238,6 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
   Widget _buildNavigationUI() {
     return Stack(
       children: [
-        // Previous Button
         if (_currentIndex > 0)
           Positioned(
             left: 16,
@@ -252,7 +250,6 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
               ),
             ),
           ),
-        // Next Button
         if (_currentIndex < widget.flyer.flyerImages.length - 1)
           Positioned(
             right: 16,
@@ -265,7 +262,6 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
               ),
             ),
           ),
-        // Page indicator
         Positioned(
           bottom: 16,
           left: 0,
@@ -307,16 +303,11 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setState(() {
-            _isDrawingMode = !_isDrawingMode;
-          });
-        },
-        child: Icon(_isDrawingMode ? Icons.edit_off : Icons.edit),
+        onPressed: _showReactionsBottomSheet,
+        child: const Icon(Icons.pets), // Cat paw icon
       ),
       body: Row(
         children: [
-          // Thumbnail Sidebar
           SizedBox(
             width: 100,
             child: ListView.builder(
@@ -329,7 +320,6 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
             ),
           ),
           const VerticalDivider(width: 1),
-          // Main Image View
           Expanded(
             child: Stack(
               children: [
