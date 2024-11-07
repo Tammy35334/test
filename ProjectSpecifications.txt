@@ -24,7 +24,24 @@ Below that is a image fo 250px height, mostly to show promotional stuff, below  
 
 
 Flyers - this pages looks exactly like the MArkets page, the idea is to show a list of grocery stores, when clicked will open the store flyer, which is usually a series of 10 flyer images that people can scroll and mark their fav items by drawing a circle.
-
+Long press to add emoji reactions:
+Users can long-press anywhere on the flyer to trigger the emoji selector
+Normalized coordinates (x_norm, y_norm) are saved for precise emoji placement
+Four emoji options (❤️, 👍, 😐, 👎) representing different sentiment scores
+Proper data persistence using Hive with String storeId
+Emoji reaction management:
+EmojiReactionManager service for handling reactions
+Proper data structure with Hive integration
+Methods for retrieving reactions by store and page
+Sentiment score calculation
+Reaction viewing interface:
+Floating action button with cat paw icon
+Bottom sheet with tabbed interface for different emoji types
+Grid layout showing reaction previews
+Navigation to specific reactions
+Clean architecture:
+Proper separation of concerns between models, services, and UI
+Type-safe implementation with String storeId throughout
 
 
 Shopping List - people can write down a shop list of their own, this is exactly like google keep.

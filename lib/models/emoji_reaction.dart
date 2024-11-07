@@ -18,7 +18,7 @@ enum EmojiType {
 @HiveType(typeId: 6)
 class EmojiReaction extends HiveObject {
   @HiveField(0)
-  final String storeId; // Changed from int to String
+  final String storeId; // Stored as String but can be created from int
 
   @HiveField(1)
   final int pageNumber;
@@ -80,14 +80,17 @@ class EmojiReaction extends HiveObject {
 
   // Create from pixel coordinates
   static EmojiReaction fromPixelPosition({
-    required String storeId, // Changed from int to String
+    required dynamic storeId, // Accept either int or String
     required int pageNumber,
     required Offset position,
     required Size pageSize,
     required EmojiType emojiType,
   }) {
+    // Convert storeId to String if it's an int
+    final String storeIdStr = storeId.toString();
+
     return EmojiReaction(
-      storeId: storeId,
+      storeId: storeIdStr,
       pageNumber: pageNumber,
       xNorm: position.dx / pageSize.width,
       yNorm: position.dy / pageSize.height,

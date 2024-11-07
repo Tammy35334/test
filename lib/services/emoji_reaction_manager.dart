@@ -5,11 +5,17 @@ import '../models/emoji_reaction.dart';
 class EmojiReactionManager {
   static const String _reactionsBoxName = 'emoji_reactions';
   Box<EmojiReaction>? _reactionsBox;
+  bool _isInitialized = false;
 
   Future<void> init() async {
+    if (_isInitialized) return;
+
     if (!Hive.isBoxOpen(_reactionsBoxName)) {
       _reactionsBox = await Hive.openBox<EmojiReaction>(_reactionsBoxName);
+    } else {
+      _reactionsBox = Hive.box<EmojiReaction>(_reactionsBoxName);
     }
+    _isInitialized = true;
   }
 
   Future<void> saveReaction(EmojiReaction reaction) async {
@@ -52,31 +58,29 @@ class EmojiReactionManager {
     return totalScore / reactions.length;
   }
 
-  // Helper method to get a preview of the flyer image around a reaction
-  Future<Image?> getReactionPreview(EmojiReaction reaction, Size pageSize) async {
-    // TODO: Implement image preview extraction using the normalized coordinates
-    // This will require access to the flyer images and proper coordinate transformation
-    return null;
-  }
-
-  // Helper method to convert between screen and normalized coordinates
-  Offset normalizeCoordinates(Offset screenPosition, Size pageSize, EdgeInsets padding) {
-    // Account for padding and calculate normalized coordinates
-    final adjustedX = screenPosition.dx - padding.left;
-    final adjustedY = screenPosition.dy - padding.top;
+  // Helper method to get normalized coordinates relative to the container
+  Offset getNormalizedPosition(Offset position, Size containerSize, EdgeInsets padding) {
+    final adjustedX = position.dx - padding.left;
+    final adjustedY = position.dy - padding.top;
     
     return Offset(
-      adjustedX / (pageSize.width - padding.horizontal),
-      adjustedY / (pageSize.height - padding.vertical),
+      adjustedX / (containerSize.width - padding.horizontal),
+      adjustedY / (containerSize.height - padding.vertical),
     );
   }
 
-  // Helper method to convert normalized coordinates back to screen position
-  Offset denormalizeCoordinates(double xNorm, double yNorm, Size pageSize, EdgeInsets padding) {
+  // Helper method to get pixel coordinates from normalized coordinates
+  Offset getPixelPosition(double xNorm, double yNorm, Size containerSize, EdgeInsets padding) {
     return Offset(
-      xNorm * (pageSize.width - padding.horizontal) + padding.left,
-      yNorm * (pageSize.height - padding.vertical) + padding.top,
+      xNorm * (containerSize.width - padding.horizontal) + padding.left,
+      yNorm * (containerSize.height - padding.vertical) + padding.top,
     );
+  }
+
+  // Helper method to clear all reactions (useful for testing)
+  Future<void> clearAllReactions() async {
+    await init();
+    await _reactionsBox?.clear();
   }
 }
 

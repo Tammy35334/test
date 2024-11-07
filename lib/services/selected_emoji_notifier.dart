@@ -3,15 +3,27 @@ import '../models/emoji_reaction.dart';
 
 class SelectedEmojiNotifier extends ValueNotifier<EmojiType> {
   SelectedEmojiNotifier() : super(EmojiType.heart); // Default to heart emoji
+
+  static SelectedEmojiNotifier of(BuildContext context) {
+    final inherited = context.dependOnInheritedWidgetOfExactType<_SelectedEmojiInherited>();
+    if (inherited == null) {
+      throw FlutterError(
+        'SelectedEmojiNotifier.of() called with a context that does not contain a SelectedEmojiProvider.\n'
+        'No SelectedEmojiProvider ancestor could be found starting from the context that was passed '
+        'to SelectedEmojiNotifier.of().'
+      );
+    }
+    return inherited.notifier;
+  }
 }
 
 class SelectedEmojiProvider extends StatefulWidget {
   final Widget child;
 
   const SelectedEmojiProvider({
-    Key? key,
+    super.key,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<SelectedEmojiProvider> createState() => _SelectedEmojiProviderState();
@@ -42,10 +54,6 @@ class _SelectedEmojiInherited extends InheritedWidget {
     required this.notifier,
     required super.child,
   });
-
-  static SelectedEmojiNotifier of(BuildContext context) {
-    return context.dependOnInheritedWidgetOfExactType<_SelectedEmojiInherited>()!.notifier;
-  }
 
   @override
   bool updateShouldNotify(_SelectedEmojiInherited old) => notifier != old.notifier;

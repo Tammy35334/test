@@ -1,84 +1,48 @@
 import 'package:hive/hive.dart';
 
+part 'flyer.g.dart';
+
 @HiveType(typeId: 1)
-class Flyer {
+class Flyer extends HiveObject {
   @HiveField(0)
-  final String storeId;
-  
+  final int storeId;
+
   @HiveField(1)
   final String storeName;
-  
-  @HiveField(2)
-  final List<String> imageUrls;
-  
-  @HiveField(3)
-  final DateTime validFrom;
-  
-  @HiveField(4)
-  final DateTime validTo;
-  
-  @HiveField(5)
-  final Map<String, List<MarkedItem>> userMarks;
 
-  const Flyer({
+  @HiveField(2)
+  final String province;
+
+  @HiveField(3)
+  final List<String> flyerImages;
+
+  @HiveField(4)
+  final DateTime lastUpdated;
+
+  Flyer({
     required this.storeId,
     required this.storeName,
-    required this.imageUrls,
-    required this.validFrom,
-    required this.validTo,
-    this.userMarks = const {},
-  });
+    required this.province,
+    required this.flyerImages,
+    DateTime? lastUpdated,
+  }) : lastUpdated = lastUpdated ?? DateTime.now();
 
   factory Flyer.fromJson(Map<String, dynamic> json) {
     return Flyer(
-      storeId: json['store_id'] as String,
-      storeName: json['store_name'] as String,
-      imageUrls: List<String>.from(json['image_urls'] as List),
-      validFrom: DateTime.parse(json['valid_from'] as String),
-      validTo: DateTime.parse(json['valid_to'] as String),
-      userMarks: (json['user_marks'] as Map<String, dynamic>?)?.map(
-            (key, value) => MapEntry(
-              key,
-              (value as List).map((e) => MarkedItem.fromJson(e)).toList(),
-            ),
-          ) ??
-          {},
+      storeId: json['storeId'] as int,
+      storeName: json['storeName'] as String,
+      province: json['province'] as String,
+      flyerImages: List<String>.from(json['flyerImages'] as List),
     );
   }
-}
 
-@HiveType(typeId: 2)
-class MarkedItem {
-  @HiveField(0)
-  final double x;
-  
-  @HiveField(1)
-  final double y;
-  
-  @HiveField(2)
-  final double radius;
-  
-  @HiveField(3)
-  final int pageIndex;
-  
-  @HiveField(4)
-  final String note;
-
-  const MarkedItem({
-    required this.x,
-    required this.y,
-    required this.radius,
-    required this.pageIndex,
-    this.note = '',
-  });
-
-  factory MarkedItem.fromJson(Map<String, dynamic> json) {
-    return MarkedItem(
-      x: (json['x'] as num).toDouble(),
-      y: (json['y'] as num).toDouble(),
-      radius: (json['radius'] as num).toDouble(),
-      pageIndex: json['page_index'] as int,
-      note: json['note'] as String? ?? '',
-    );
+  Map<String, dynamic> toJson() {
+    return {
+      'storeId': storeId,
+      'storeName': storeName,
+      'province': province,
+      'flyerImages': flyerImages,
+      'lastUpdated': lastUpdated.toIso8601String(),
+    };
   }
 }

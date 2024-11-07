@@ -6,15 +6,18 @@ import '../repositories/flyer_repository.dart';
 import '../widgets/optimized_flyer_image.dart';
 import '../models/emoji_reaction.dart';
 import '../services/emoji_reaction_manager.dart';
-import '../widgets/emoji_reaction_overlay.dart';
 import '../widgets/emoji_reactions_bottom_sheet.dart';
 
 class FlyerDetailScreen extends StatefulWidget {
   final Flyer flyer;
+  final int initialPage;
+  final VoidCallback? onShowList;
 
   const FlyerDetailScreen({
     super.key,
     required this.flyer,
+    this.initialPage = 0,
+    this.onShowList,
   });
 
   @override
@@ -24,20 +27,36 @@ class FlyerDetailScreen extends StatefulWidget {
 class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
   late final TransformationController _transformationController;
   late List<Uint8List?> _imageBytesList;
-  int _currentIndex = 0;
+  late int _currentIndex;
   bool _isZoomed = false;
   bool _isLoading = true;
-  Offset? _longPressPosition;
   late final EmojiReactionManager _emojiManager;
+  Map<String, List<EmojiReaction>>? _reactionsByStore;
+  Map<String, String> _storeNames = {};
+  EmojiType _selectedEmoji = EmojiType.heart; // Default emoji
   
   @override
   void initState() {
     super.initState();
+    _currentIndex = widget.initialPage;
     _transformationController = TransformationController();
     _transformationController.addListener(_onTransformChanged);
     _imageBytesList = List.filled(widget.flyer.flyerImages.length, null);
     _loadImages();
     _emojiManager = context.read<EmojiReactionManager>();
+    _loadReactions();
+  }
+
+  Future<void> _loadReactions() async {
+    await _emojiManager.init();
+    setState(() {
+      _reactionsByStore = {
+        widget.flyer.storeId.toString(): _emojiManager.getReactionsForStore(widget.flyer.storeId.toString())
+      };
+      _storeNames = {
+        widget.flyer.storeId.toString(): widget.flyer.storeName
+      };
+    });
   }
 
   @override
@@ -55,7 +74,7 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
     
     if (mounted) {
       setState(() {
-        _imageBytesList = List<Uint8List?>.from(loadedImages);
+        _imageBytesList = loadedImages;
         _isLoading = false;
       });
     }
@@ -83,48 +102,85 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
     }
   }
 
-  void _onLongPressStart(LongPressStartDetails details) {
-    final box = context.findRenderObject() as RenderBox;
-    final position = box.globalToLocal(details.globalPosition);
-    
-    setState(() {
-      _longPressPosition = position;
-    });
+  void _showEmojiSelector() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Emoji'),
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: EmojiType.values.map((type) {
+            final emoji = EmojiReaction(
+              storeId: "0",
+              pageNumber: 0,
+              xNorm: 0,
+              yNorm: 0,
+              emojiType: type,
+            ).emojiChar;
+
+            return InkWell(
+              onTap: () {
+                setState(() {
+                  _selectedEmoji = type;
+                });
+                Navigator.pop(context);
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _selectedEmoji == type ? Colors.blue.withOpacity(0.2) : null,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  emoji,
+                  style: const TextStyle(fontSize: 32),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
   }
 
-  void _onEmojiSelected(EmojiType type) {
-    if (_longPressPosition == null) return;
+  void _onLongPress(LongPressStartDetails details) {
+    if (_isZoomed) return;
 
     final box = context.findRenderObject() as RenderBox;
+    final position = box.globalToLocal(details.globalPosition);
     final size = box.size;
-
+    
     final reaction = EmojiReaction.fromPixelPosition(
-      storeId: widget.flyer.storeId.toString(), // Convert to String
+      storeId: widget.flyer.storeId,
       pageNumber: _currentIndex,
-      position: _longPressPosition!,
+      position: position,
       pageSize: size,
-      emojiType: type,
+      emojiType: _selectedEmoji,
     );
 
     _emojiManager.saveReaction(reaction);
-
-    setState(() {
-      _longPressPosition = null;
-    });
+    _loadReactions(); // Refresh reactions
   }
 
   void _showReactionsBottomSheet() {
-    final reactions = _emojiManager.getReactionsByType(widget.flyer.storeId.toString()); // Convert to String
+    if (_reactionsByStore == null) return;
     
     showModalBottomSheet(
       context: context,
-      builder: (context) => EmojiReactionsBottomSheet(
-        reactions: reactions,
-        onReactionSelected: (reaction) {
-          Navigator.pop(context);
-          _navigateToImage(reaction.pageNumber);
-          // TODO: Highlight the selected reaction
-        },
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.3,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => EmojiReactionsBottomSheet(
+          reactionsByStore: _reactionsByStore!,
+          storeNames: _storeNames,
+          onReactionSelected: (reaction) {
+            Navigator.pop(context);
+            _navigateToImage(reaction.pageNumber);
+          },
+        ),
       ),
     );
   }
@@ -134,38 +190,29 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Stack(
-      children: [
-        GestureDetector(
-          onLongPressStart: _onLongPressStart,
-          child: InteractiveViewer(
-            transformationController: _transformationController,
-            minScale: 1.0,
-            maxScale: 4.0,
-            child: Stack(
-              children: [
-                OptimizedFlyerImage(
-                  key: ValueKey('image_$_currentIndex'),
-                  imageBytes: _imageBytesList[_currentIndex]!,
-                  fit: BoxFit.contain,
-                ),
-                ..._buildEmojiOverlays(),
-              ],
+    return GestureDetector(
+      onLongPressStart: _onLongPress,
+      child: InteractiveViewer(
+        transformationController: _transformationController,
+        minScale: 1.0,
+        maxScale: 4.0,
+        child: Stack(
+          children: [
+            OptimizedFlyerImage(
+              key: ValueKey('image_$_currentIndex'),
+              imageBytes: _imageBytesList[_currentIndex]!,
+              fit: BoxFit.contain,
             ),
-          ),
+            if (!_isZoomed) ..._buildEmojiOverlays(),
+          ],
         ),
-        if (_longPressPosition != null)
-          EmojiReactionOverlay(
-            position: _longPressPosition!,
-            onEmojiSelected: _onEmojiSelected,
-          ),
-      ],
+      ),
     );
   }
 
   List<Widget> _buildEmojiOverlays() {
     final reactions = _emojiManager.getReactionsForPage(
-      widget.flyer.storeId.toString(), // Convert to String
+      widget.flyer.storeId.toString(),
       _currentIndex,
     );
 
@@ -295,7 +342,24 @@ class _FlyerDetailScreenState extends State<FlyerDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.flyer.storeName),
+        leading: widget.onShowList != null ? IconButton(
+          icon: const Icon(Icons.list),
+          onPressed: widget.onShowList,
+        ) : null,
         actions: [
+          IconButton(
+            icon: Text(
+              EmojiReaction(
+                storeId: "0",
+                pageNumber: 0,
+                xNorm: 0,
+                yNorm: 0,
+                emojiType: _selectedEmoji,
+              ).emojiChar,
+              style: const TextStyle(fontSize: 24),
+            ),
+            onPressed: _showEmojiSelector,
+          ),
           IconButton(
             icon: const Icon(Icons.restart_alt),
             onPressed: _resetZoom,

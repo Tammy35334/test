@@ -6,10 +6,10 @@ class EmojiReactionOverlay extends StatelessWidget {
   final Function(EmojiType) onEmojiSelected;
 
   const EmojiReactionOverlay({
-    Key? key,
+    super.key,
     required this.position,
     required this.onEmojiSelected,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
