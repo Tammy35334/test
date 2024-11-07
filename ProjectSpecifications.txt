@@ -1,5 +1,5 @@
 # Grocery Price Comparison App Technical Specification
-
+FInal
 # about the app
 I will give you an app idea, I figured out a few blocks. give me a detailed specification of how the front end, backend architecture should function in order to achieve the goals.
 
