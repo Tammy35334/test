@@ -1,80 +1,89 @@
-[
-  {
-    "product_name": "Whole Chicken",
-    "price": "1.99/lb",
-    "description": "4.39/kg",
-    "center": [243, 294]
-  },
-  {
-    "product_name": "Blueberries",
-    "price": "4.99",
-    "description": "Product of Canada or U.S.A., 2 lb Clamshell",
-    "center": [135, 518]
-  },
-  {
-    "product_name": "PC® or Free From® Bacon",
-    "price": "Sale 4.99",
-    "description": "Selected varieties 250-500g",
-    "center": [273, 730]
-  },
-    {
-    "product_name": "Simply Orange or Gold Peak Iced Tea",
-    "price": "6.49",
-    "description": "Selected Varieties, Refrigerated 2.63L",
-    "center": [390, 258]
-  },
-     {
-    "product_name": "Real Canadian Natural Spring Water",
-    "price": "1.99",
-    "description": "24 x 500ml",
-    "center": [482, 462]
-  },
-    {
-    "product_name": "Kraft Peanut Butter or Hazelnut Spread",
-    "price": "5.77",
-       "description": "750g/1kg or 725g, Selected varieties",
-    "center": [350, 728]
-  },
+{
+  "image_url": "https://raw.githubusercontent.com/Tammy35334/test/refs/heads/main/15.jpg",
+  "products": [
       {
-    "product_name": "Coca-Cola, Canada Dry, or Dasani Water",
-       "price": "Up to $24.98",
-       "description": "Any 2 Coca-Cola or Canada Dry Soft Drinks 12 x 1L or Dasani Remineralized Water 12x1.5L, Selected Varieties",
-    "center": [548, 836]
-  },
-        {
-    "product_name": "PC® Cooked or Raw White Peeled Shrimp or Zipperback White Raw Pacific Shrimp",
-    "price": "7.99",
-        "description": "Frozen, 31-40/lb, 400g or Lobster Tails Frozen or Previously Frozen, 4-5 oz",
-    "center": [633, 217]
-  },
+      "product_name": "Whole Chicken",
+      "price": "1.99/lb",
+      "description": "4.39/kg",
+      "center": [243, 294]
+    },
+    {
+      "product_name": "Blueberries",
+      "price": "4.99",
+      "description": "Product of Canada or U.S.A., 2 lb Clamshell",
+      "center": [135, 518]
+    },
+    {
+      "product_name": "PC® or Free From® Bacon",
+      "price": "Sale 4.99",
+      "description": "Selected varieties 250-500g",
+      "center": [273, 730]
+    },
+    {
+      "product_name": "Simply Orange or Gold Peak Iced Tea",
+      "price": "6.49",
+      "description": "Selected Varieties, Refrigerated 2.63L",
+      "center": [390, 258]
+    },
+    {
+      "product_name": "Real Canadian Natural Spring Water",
+      "price": "1.99",
+      "description": "24 x 500ml",
+      "center": [482, 462]
+    },
+    {
+      "product_name": "Kraft Peanut Butter or Hazelnut Spread",
+      "price": "5.77",
+      "description": "750g/1kg or 725g, Selected varieties",
+      "center": [350, 728]
+    },
       {
-    "product_name": "Tostitos Tortilla Chips",
-    "price": "2.99",
-       "description": "Selected varieties",
-    "center": [655, 724]
-  },
+      "product_name": "Coca-Cola, Canada Dry, or Dasani Water",
+      "price": "Up to $24.98",
+      "description": "Any 2 Coca-Cola or Canada Dry Soft Drinks 12 x 1L or Dasani Remineralized Water 12x1.5L, Selected Varieties",
+      "center": [548, 836]
+    },
     {
-    "product_name": "D'Italiano Bread or Buns",
-    "price": "2.99",
-    "description": "600/675g or 6/8's, Selected Varieties and sizes",
-    "center": [847, 269]
-  },
+      "product_name": "PC® Cooked or Raw White Peeled Shrimp or Zipperback White Raw Pacific Shrimp",
+      "price": "7.99",
+      "description": "Frozen, 31-40/lb, 400g or Lobster Tails Frozen or Previously Frozen, 4-5 oz",
+      "center": [633, 217]
+    },
     {
-    "product_name": "Maxwell House Ground Coffee",
-    "price": "8.99",
-        "description": "631-900g, Selected Varieties",
-    "center": [837, 611]
-  },
+      "product_name": "Tostitos Tortilla Chips",
+      "price": "2.99",
+      "description": "Selected varieties",
+      "center": [655, 724]
+    },
     {
-    "product_name": "Charmin Bathroom Tissue or Bounty Paper Towel",
-    "price": "20.99",
-       "description": "24=96 or 8=24, Selected varieties",
-    "center": [881, 227]
-  },
+      "product_name": "D'Italiano Bread or Buns",
+      "price": "2.99",
+       "description": "600/675g or 6/8's, Selected Varieties and sizes",
+       "center": [847, 269]
+    },
     {
-    "product_name": "Old Spice, Secret, or Gillette Dry Spray or Deodorant/Antiperspirant",
-    "price": "5.99",
-    "description": "116-144g or 45-108g, Selected Varieties",
-        "center": [880, 838]
-  }
-]
+      "product_name":"D'Italiano 500 PC Optimum Points offer for D'Italiano products",
+      "price": "500",
+      "description": "Points when you buy D'Italiano Bread",
+      "center": [763,223]
+    },
+    {
+      "product_name": "Maxwell House Ground Coffee",
+      "price": "8.99",
+      "description": "631-900g, Selected Varieties",
+      "center": [837, 611]
+    },
+      {
+      "product_name": "Charmin Bathroom Tissue or Bounty Paper Towel",
+      "price": "20.99",
+      "description": "24=96 or 8=24, Selected varieties",
+      "center": [881, 227]
+        },
+          {
+      "product_name": "Old Spice, Secret, or Gillette Dry Spray or Deodorant/Antiperspirant",
+      "price": "5.99",
+          "description": "$1 off with 1000 PC Optimum Points",
+      "center": [880, 838]
+    }
+  ]
+}
