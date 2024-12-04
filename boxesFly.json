@@ -1,132 +1,109 @@
 {
   "image_url": "https://raw.githubusercontent.com/Tammy35334/test/refs/heads/main/15.jpg",
+{
   "products": [
     {
       "name": "Whole Chicken",
       "price": "1.99/LB",
       "save": "2.00/LB",
-      "coordinates": {
+      "hotspot": {
         "x": 150,
-        "y": 150,
-        "width": 200,
-        "height": 150
+        "y": 180
       }
     },
     {
       "name": "Blueberries",
       "price": "3.99",
-      "coordinates": {
+      "hotspot": {
         "x": 400,
-        "y": 150,
-        "width": 200,
-        "height": 150
+        "y": 180
       }
     },
     {
       "name": "Bacon",
       "price": "4.99",
-      "coordinates": {
+      "hotspot": {
         "x": 650,
-        "y": 150,
-        "width": 200,
-        "height": 150
+        "y": 180
       }
     },
     {
       "name": "Simply Orange Juice",
       "price": "6.49",
-      "coordinates": {
+      "hotspot": {
         "x": 150,
-        "y": 350,
-        "width": 150,
-        "height": 150
+        "y": 380
       }
     },
     {
       "name": "Spring Water",
       "price": "1.99",
       "save": "0.50",
-      "coordinates": {
+      "hotspot": {
         "x": 400,
-        "y": 350,
-        "width": 150,
-        "height": 150
+        "y": 380
       }
     },
     {
       "name": "Kraft Hazelnut Spread",
       "price": "5.77",
       "save": "1.50",
-      "coordinates": {
+      "hotspot": {
         "x": 650,
-        "y": 350,
-        "width": 150,
-        "height": 150
+        "y": 380
       }
     },
     {
       "name": "Cooked Lobster Tails",
       "price": "7.99",
       "save": "3.00",
-      "coordinates": {
+      "hotspot": {
         "x": 150,
-        "y": 600,
-        "width": 200,
-        "height": 150
+        "y": 630
       }
     },
     {
       "name": "Tostitos Tortilla Chips",
       "price": "2.99",
       "save": "1.80",
-      "coordinates": {
+      "hotspot": {
         "x": 400,
-        "y": 600,
-        "width": 200,
-        "height": 150
+        "y": 630
       }
     },
     {
       "name": "D'Italiano Bread",
       "price": "2.99",
-      "coordinates": {
+      "hotspot": {
         "x": 150,
-        "y": 800,
-        "width": 200,
-        "height": 150
+        "y": 830
       }
     },
     {
       "name": "Maxwell House Coffee",
       "price": "8.99",
       "save": "1.00",
-      "coordinates": {
+      "hotspot": {
         "x": 400,
-        "y": 800,
-        "width": 200,
-        "height": 150
+        "y": 830
       }
     },
     {
       "name": "Charmin Bathroom Tissue & Bounty",
       "price": "20.99",
       "save": "6.50",
-      "coordinates": {
+      "hotspot": {
         "x": 150,
-        "y": 1000,
-        "width": 200,
-        "height": 150
+        "y": 1030
       }
     },
     {
       "name": "Old Spice Deodorant",
       "price": "5.99",
       "save": "3.00",
-      "coordinates": {
+      "hotspot": {
         "x": 400,
-        "y": 1000,
-        "width": 200,
-        "height": 150
+        "y": 1030
       }
     }
   ],
@@ -135,13 +112,10 @@
       "name": "2 FREE Coca-Cola",
       "description": "When you spend $300 or more",
       "value": "Up to $24.98 value",
-      "coordinates": {
+      "hotspot": {
         "x": 300,
-        "y": 450,
-        "width": 400,
-        "height": 100
+        "y": 480
       }
     }
   ]
 }
-
