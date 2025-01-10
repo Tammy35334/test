@@ -1,222 +1,569 @@
-[
-  {
-    "storeId": 1,
-    "storeName": "Loblaws",
-    "province": "National",
-    "flyerImages": [
-      "https://flyers.smartcanucks.ca/uploads/pages/253548/no-frills-on-flyer-october-17-to-233-2.jpg",
-      "https://flyers.smartcanucks.ca/uploads/pages/253548/no-frills-on-flyer-october-17-to-233-2.jpg",
-      "https://flyers.smartcanucks.ca/uploads/pages/253548/no-frills-on-flyer-october-17-to-233-2.jpg"
-    ]
-  },
-  {
-    "storeId": 2,
-    "storeName": "Real Canadian Superstore",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 3,
-    "storeName": "No Frills",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 4,
-    "storeName": "Sobeys",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 5,
-    "storeName": "Safeway",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 6,
-    "storeName": "Metro",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 7,
-    "storeName": "IGA",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 8,
-    "storeName": "Food Basics",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 9,
-    "storeName": "FreshCo",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 10,
-    "storeName": "Walmart Canada",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 11,
-    "storeName": "Save-On-Foods",
-    "province": "BC",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 12,
-    "storeName": "Real Canadian Superstore",
-    "province": "BC",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 13,
-    "storeName": "Whole Foods Market",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 14,
-    "storeName": "Costco Canada",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 15,
-    "storeName": "Giant Tiger",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 16,
-    "storeName": "Home Hardware",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 17,
-    "storeName": "Rona",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 18,
-    "storeName": "Lowe's Canada",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 19,
-    "storeName": "Canadian Tire",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 20,
-    "storeName": "PetSmart Canada",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 21,
-    "storeName": "Ren's Pet Depot",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  },
-  {
-    "storeId": 22,
-    "storeName": "Bulk Barn",
-    "province": "National",
-    "flyerImages": [
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png",
-      "https://placehold.co/400x900.png"
-    ]
-  }
-]
+{
+  "stores": [
+    {
+      "storeId": "metro1",
+      "storeName": "metro",
+      "logo": null,
+      "flyer_valid_from": "2024-07-25",
+      "flyer_valid_to": "2024-07-31",
+      "categories": [
+        {
+          "category": "Meat",
+          "categoryOrder": null,
+          "emoji": "",
+          "items": [
+            {
+              "itemId": "metro1_meat_irresistiblesbeefburgers",
+              "itemName": "Irresistibles Beef Burgers",
+              "itemTitle": "IRRESISTIBLES BEEF BURGERS",
+              "itemDescription": "Frozen, 852 g - 1.02 kg Selected Varieties",
+              "price": 11.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_meat_redgrillsteak",
+              "itemName": "Red Grill Cap Off Rib Steak",
+              "itemTitle": "RED GRILL CAP OFF RIB STEAK VALUE PACK",
+              "itemDescription": "Cut from Canada AA or USDA Select Grade or Higher",
+              "price": 9.97,
+              "unit": "/lb",
+              "image": null,
+              "is_featured": true,
+              "featured_order": 1,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_meat_cuddyturkeybreast",
+              "itemName": "Cuddy or Lilydale Turkey Breast",
+              "itemTitle": "CUDDY OR LILYDALE TURKEY BREAST",
+              "itemDescription": "Selected Varieties, Deli Sliced",
+              "price": 2.99,
+              "unit": "/100 g",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_meat_porksirloinchops",
+              "itemName": "Boneless Pork Sirloin Chops",
+              "itemTitle": "BONELESS PORK SIRLOIN CHOPS",
+              "itemDescription": "Value Pack or Roast",
+              "price": 2.99,
+              "unit": "/lb",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            }
+          ]
+        },
+        {
+          "category": "Dairy",
+          "categoryOrder": null,
+          "emoji": "",
+          "items": [
+            {
+              "itemId": "metro1_dairy_agropurcheese",
+              "itemName": "Agropur Regular Oka Cheese, Chevalier Brie, Triple Creme Cheese or Agropur 3-Year Aged Grand Cheddar",
+              "itemTitle": "AGROPUR REGULAR OKA CHEESE, CHEVALIER BRIE TRIPLE CREME CHEESE OR AGROPUR 3-YEAR AGED GRAND CHEDDAR",
+              "itemDescription": "Deli Cut, Prices as Marked",
+              "price": null,
+              "unit": null,
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_dairy_blackdiamondcheese",
+              "itemName": "Black Diamond Bars or Shredded Cheese",
+              "itemTitle": "BLACK DIAMOND MARBLE MARBRÉ OR OLD CHEDDAR",
+              "itemDescription": "Selected Sizes Selected Varieties",
+              "price": 4.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": true,
+              "featured_order": 2,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_dairy_selectioncream",
+              "itemName": "Selection Cream or Whipping Cream",
+              "itemTitle": "SELECTION CREAM OR WHIPPING CREAM",
+              "itemDescription": "473 mL - 1 L Selected Varieties",
+              "price": 2.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            }
+          ]
+        },
+        {
+          "category": "Seafood",
+          "categoryOrder": null,
+          "emoji": "",
+          "items": [
+            {
+              "itemId": "metro1_seafood_wildsockeyesalmon",
+              "itemName": "Fresh Wild Sockeye Salmon Fillets",
+              "itemTitle": "FRESH WILD SOCKEYE SALMON FILLETS VALUE PACK",
+              "itemDescription": "Min 900 g, Ocean Prime Raw Shrimp or Fresh Water Shelled Shrimp",
+              "price": 15.99,
+              "unit": "/lb or ea.",
+              "image": null,
+              "is_featured": true,
+              "featured_order": 3,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            }
+          ]
+        },
+        {
+          "category": "Produce",
+          "categoryOrder": null,
+          "emoji": "",
+          "items": [
+            {
+              "itemId": "metro1_produce_blueberries",
+              "itemName": "Blueberries",
+              "itemTitle": "BLUEBERRIES PINT",
+              "itemDescription": "Product of Canada, No. 1 Grade",
+              "price": 1.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": true,
+              "featured_order": 4,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_produce_lemons",
+              "itemName": "Lemons",
+              "itemTitle": "LEMONS 2 lb",
+              "itemDescription": "Product of South Africa, Romaine Hearts 3 pk Product of U.S.A.",
+              "price": 2.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            }
+          ]
+        },
+        {
+          "category": "Bakery",
+          "categoryOrder": null,
+          "emoji": "",
+          "items": [
+            {
+              "itemId": "metro1_bakery_dempstersbread",
+              "itemName": "Dempster's White or Whole Wheat Bread or Irresistibles Naan",
+              "itemTitle": "DEMPSTER'S WHITE, 100% WHOLE WHEAT BREAD OR IRRESISTIBLES NAANS",
+              "itemDescription": "192 - 675 g, Selected Varieties, or Irresistibles Naan",
+              "price": 6.00,
+              "unit": "2 for",
+              "image": null,
+              "is_featured": true,
+              "featured_order": 5,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            }
+          ]
+        },
+        {
+          "category": "Pantry",
+          "categoryOrder": null,
+          "emoji": "",
+          "items": [
+            {
+              "itemId": "metro1_pantry_generalmillscereal",
+              "itemName": "General Mills or Quaker Cereal",
+              "itemTitle": "GENERAL MILLS, POST OR QUAKER CEREAL",
+              "itemDescription": "Selected Sizes, Selected Varieties",
+              "price": 3.49,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_pantry_nescafecoffee",
+              "itemName": "Nescafe or Maxwell House Instant Coffee or Twinings Tea",
+              "itemTitle": "NESCAFE OR MAXWELL HOUSE INSTANT COFFEE OR TWININGS TEA",
+              "itemDescription": "95 - 150 g or Twinings Tea 20 un., Selected Varieties",
+              "price": 2.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_pantry_selectioncoffeecream",
+              "itemName": "Selection Coffee Cream",
+              "itemTitle": "SELECTION COFFEE CREAM",
+              "itemDescription": "1 L, 10%",
+              "price": 2.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_pantry_rufflessnacks",
+              "itemName": "Ruffles, Smartfood or Tostitos Tortilla Chips or Salsa",
+              "itemTitle": "RUFFLES, SMARTFOOD OR TOSTITOS TORTILLA CHIPS OR SALSA",
+              "itemDescription": "Selected Sizes, Selected Varieties",
+              "price": 3.33,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_pantry_charmintissue",
+              "itemName": "Charmin Bathroom Tissue, Bounty Paper Towel or Listerine Mouthwash",
+              "itemTitle": "CHARMIN BATHROOM TISSUE, BOUNTY PAPER TOWEL OR LISTERINE MOUTHWASH",
+              "itemDescription": "Selected Sizes, Selected Varieties",
+              "price": 5.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_pantry_bublywater",
+              "itemName": "Bubly or Montellier Sparkling Water or Gatorade Sport Drinks",
+              "itemTitle": "BUBLY OR MONTELLIER SPARKLING WATER OR GATORADE SPORT DRINKS",
+              "itemDescription": "Selected Varieties, 12 x 355 mL or 10 x 355 mL",
+              "price": 11.00,
+              "unit": "2 for",
+              "image": null,
+              "is_featured": false,
+              "featured_order": null,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            },
+            {
+              "itemId": "metro1_pantry_selectioneggs",
+              "itemName": "Selection Eggs or Irresistibles Maple Syrup",
+              "itemTitle": "SELECTION EGGS, IRRESISTIBLES MAPLE SYRUP",
+              "itemDescription": "500 - 540 mL, 30 Un., Selected Varieties",
+              "price": 7.99,
+              "unit": "ea.",
+              "image": null,
+              "is_featured": true,
+              "featured_order": 6,
+              "is_favorite": false,
+              "recipes": {
+                "is_recipe": false,
+                "recipeList": []
+              }
+            }
+          ]
+        }
+      ],
+      "recipes": {
+        "is_recipe": true,
+        "recipeList": [
+          {
+            "recipeId": "metro1_blueberry_cereal",
+            "recipeName": "Blueberry Cereal",
+            "recipeDescription": "A simple breakfast with cereal topped with fresh blueberries.",
+            "totalRecipeCost": 5.48,
+            "recipeTypes": [
+              "breakfast"
+            ],
+            "recipeIngredients": [
+              "metro1_pantry_generalmillscereal",
+              "metro1_produce_blueberries"
+            ],
+            "recipeDay": "day1",
+            "recipeOrder": 1
+          },
+          {
+            "recipeId": "metro1_turkey_and_cheese_sandwich",
+            "recipeName": "Turkey and Cheese Sandwich",
+            "recipeDescription": "A classic lunch featuring sliced turkey breast and cheese on bread.",
+            "totalRecipeCost": 7.99,
+            "recipeTypes": [
+              "lunch"
+            ],
+            "recipeIngredients": [
+              "metro1_meat_cuddyturkeybreast",
+              "metro1_dairy_blackdiamondcheese",
+              "metro1_bakery_dempstersbread"
+            ],
+            "recipeDay": "day1",
+            "recipeOrder": 2
+          },
+          {
+            "recipeId": "metro1_grilled_steak",
+            "recipeName": "Grilled Steak",
+            "recipeDescription": "A delicious grilled rib steak, seasoned to perfection. (Salt and pepper not listed).",
+            "totalRecipeCost": 9.97,
+            "recipeTypes": [
+              "dinner"
+            ],
+            "recipeIngredients": [
+              "metro1_meat_redgrillsteak"
+            ],
+            "recipeDay": "day1",
+            "recipeOrder": 3
+          },
+          {
+            "recipeId": "metro1_scrambled_eggs",
+            "recipeName": "Scrambled Eggs",
+            "recipeDescription": "Simple and quick scrambled eggs for breakfast. (Oil, salt, pepper not listed).",
+            "totalRecipeCost": 7.99,
+            "recipeTypes": [
+              "breakfast"
+            ],
+            "recipeIngredients": [
+              "metro1_pantry_selectioneggs"
+            ],
+            "recipeDay": "day2",
+            "recipeOrder": 1
+          },
+          {
+            "recipeId": "metro1_cheese_and_crackers",
+            "recipeName": "Cheese and Crackers",
+            "recipeDescription": "A light lunch of assorted cheeses. (Crackers not listed).",
+            "totalRecipeCost": null,
+            "recipeTypes": [
+              "lunch"
+            ],
+            "recipeIngredients": [
+              "metro1_dairy_agropurcheese"
+            ],
+            "recipeDay": "day2",
+            "recipeOrder": 2
+          },
+          {
+            "recipeId": "metro1_baked_salmon",
+            "recipeName": "Baked Salmon with Lemon",
+            "recipeDescription": "Fresh sockeye salmon fillets baked with lemon. (Oil, salt, pepper not listed).",
+            "totalRecipeCost": 18.98,
+            "recipeTypes": [
+              "dinner"
+            ],
+            "recipeIngredients": [
+              "metro1_seafood_wildsockeyesalmon",
+              "metro1_produce_lemons"
+            ],
+            "recipeDay": "day2",
+            "recipeOrder": 3
+          },
+          {
+            "recipeId": "metro1_cereal_with_cream",
+            "recipeName": "Cereal with Cream",
+            "recipeDescription": "A comforting breakfast of cereal with a splash of coffee cream.",
+            "totalRecipeCost": 6.48,
+            "recipeTypes": [
+              "breakfast"
+            ],
+            "recipeIngredients": [
+              "metro1_pantry_generalmillscereal",
+              "metro1_pantry_selectioncoffeecream"
+            ],
+            "recipeDay": "day3",
+            "recipeOrder": 1
+          },
+          {
+            "recipeId": "metro1_turkey_sandwich",
+            "recipeName": "Turkey Sandwich",
+            "recipeDescription": "Simple turkey breast slices on bread for a quick lunch.",
+            "totalRecipeCost": 5.99,
+            "recipeTypes": [
+              "lunch"
+            ],
+            "recipeIngredients": [
+              "metro1_meat_cuddyturkeybreast",
+              "metro1_bakery_dempstersbread"
+            ],
+            "recipeDay": "day3",
+            "recipeOrder": 2
+          },
+          {
+            "recipeId": "metro1_pork_chops",
+            "recipeName": "Pan-Fried Pork Chops",
+            "recipeDescription": "Boneless pork sirloin chops pan-fried until golden brown. (Oil, salt, pepper not listed).",
+            "totalRecipeCost": 2.99,
+            "recipeTypes": [
+              "dinner"
+            ],
+            "recipeIngredients": [
+              "metro1_meat_porksirloinchops"
+            ],
+            "recipeDay": "day3",
+            "recipeOrder": 3
+          },
+          {
+            "recipeId": "metro1_blueberry_yogurt",
+            "recipeName": "Blueberry Yogurt",
+            "recipeDescription": "A healthy breakfast of yogurt topped with fresh blueberries. (Yogurt not listed).",
+            "totalRecipeCost": 1.99,
+            "recipeTypes": [
+              "breakfast"
+            ],
+            "recipeIngredients": [
+              "metro1_produce_blueberries"
+            ],
+            "recipeDay": "day4",
+            "recipeOrder": 1
+          },
+          {
+            "recipeId": "metro1_cheese_sandwich",
+            "recipeName": "Cheese Sandwich",
+            "recipeDescription": "A basic cheese sandwich for a light lunch.",
+            "totalRecipeCost": 4.99,
+            "recipeTypes": [
+              "lunch"
+            ],
+            "recipeIngredients": [
+              "metro1_dairy_blackdiamondcheese",
+              "metro1_bakery_dempstersbread"
+            ],
+            "recipeDay": "day4",
+            "recipeOrder": 2
+          },
+          {
+            "recipeId": "metro1_steak_and_cheese",
+            "recipeName": "Steak and Cheese Bites",
+            "recipeDescription": "Small pieces of rib steak with melted cheese. (Oil not listed).",
+            "totalRecipeCost": 14.96,
+            "recipeTypes": [
+              "dinner"
+            ],
+            "recipeIngredients": [
+              "metro1_meat_redgrillsteak",
+              "metro1_dairy_blackdiamondcheese"
+            ],
+            "recipeDay": "day4",
+            "recipeOrder": 3
+          },
+          {
+            "recipeId": "metro1_eggs_and_toast",
+            "recipeName": "Eggs and Toast",
+            "recipeDescription": "A classic breakfast of eggs and toast. (Oil, salt, pepper not listed).",
+            "totalRecipeCost": 7.99,
+            "recipeTypes": [
+              "breakfast"
+            ],
+            "recipeIngredients": [
+              "metro1_pantry_selectioneggs",
+              "metro1_bakery_dempstersbread"
+            ],
+            "recipeDay": "day5",
+            "recipeOrder": 1
+          },
+          {
+            "recipeId": "metro1_turkey_and_cheese",
+            "recipeName": "Turkey and Cheese Snack",
+            "recipeDescription": "Sliced turkey breast and cheese for a simple lunch.",
+            "totalRecipeCost": 7.98,
+            "recipeTypes": [
+              "lunch"
+            ],
+            "recipeIngredients": [
+              "metro1_meat_cuddyturkeybreast",
+              "metro1_dairy_blackdiamondcheese"
+            ],
+            "recipeDay": "day5",
+            "recipeOrder": 2
+          },
+          {
+            "recipeId": "metro1_salmon_with_lemon",
+            "recipeName": "Pan-Fried Salmon with Lemon",
+            "recipeDescription": "Fresh sockeye salmon pan-fried with a squeeze of lemon. (Oil, salt, pepper not listed).",
+            "totalRecipeCost": 18.98,
+            "recipeTypes": [
+              "dinner"
+            ],
+            "recipeIngredients": [
+              "metro1_seafood_wildsockeyesalmon",
+              "metro1_produce_lemons"
+            ],
+            "recipeDay": "day5",
+            "recipeOrder": 3
+          }
+        ]
+      }
+    }
+  ]
+}
